@@ -135,9 +135,3 @@ gpt_param = {"engine": "text-davinci-003", "max_tokens": 20,
 print (local_LLM(prompt))
 
 #print(get_embedding(prompt))
-
-
-#TODO
-# add custom parameters from the original paper so that we do not need to experiment
-# check device 
-# find open source encoder, T5?

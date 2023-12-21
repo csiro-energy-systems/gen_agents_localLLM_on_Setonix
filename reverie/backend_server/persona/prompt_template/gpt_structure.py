@@ -304,11 +304,8 @@ def local_LLM(prompt, model_param=None):
     do_sample=True
   
   #try: 
-  # Loading model and tokenizer
     
-  ## TODO calling tokenizer and model in every function call may be redundant
-  tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-  model = AutoModelForCausalLM.from_pretrained(checkpoint).to(device) # device_map="auto" distributes LLM accross multiple GPUs (DON'T SET DEVICE MAP FOR TRAINING; ONLY FOR INFERENCING)
+  # process input
   inputs = tokenizer(prompt, return_tensors="pt").to(device) # Tokenize
   start_index = inputs["input_ids"].shape[-1]
   outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, temperature=temperature) # Generate output  
