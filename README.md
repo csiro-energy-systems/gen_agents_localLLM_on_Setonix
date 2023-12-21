@@ -14,10 +14,19 @@ To set up your environment, you will need to generate a `utils.py` file that con
 ### Step 1. Generate Utils File
 In the `reverie/backend_server` folder (where `reverie.py` is located), create a new file titled `utils.py` and copy and paste the content below into the file:
 ```
-# Copy and paste your OpenAI API Key
-openai_api_key = "<Your OpenAI API>"
 # Put your name
-key_owner = "<Name>"
+key_owner = "YusukeM"
+
+# huggingface key to load localLLM
+from huggingface_hub import login
+# Copy and paste your huggingface token
+hf_hey = ""
+login(hf_hey)
+checkpoint = "bigscience/bloom-560m" # "meta-llama/Llama-2-70b-chat-hf"
+embedding_checkpoint = "jinaai/jina-embeddings-v2-base-en"
+
+import torch
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 maze_assets_loc = "../../environment/frontend_server/static_dirs/assets"
 env_matrix = f"{maze_assets_loc}/the_ville/matrix"
