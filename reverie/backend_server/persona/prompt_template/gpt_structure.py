@@ -9,6 +9,8 @@ import random
 import openai
 import time 
 
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModel
+
 from utils import *
 
 openai.api_key = openai_api_key
@@ -119,8 +121,8 @@ def GPT4_safe_generate_response(prompt,
 
   return False
 
-
-def ChatGPT_safe_generate_response(prompt, 
+# Yusuke changed the function name 19/12/2023
+def ChatGPT_safe_generate_response_v2(prompt, 
                                    example_output,
                                    special_instruction,
                                    repeat=3,
@@ -162,6 +164,52 @@ def ChatGPT_safe_generate_response(prompt,
       pass
 
   return False
+
+### created by Yusuke 19/12/2023
+# This is separete function from safe_generate_response. It was originally ran by ChatGPT
+def ChatGPT_safe_generate_response(prompt, 
+                                   example_output,
+                                   special_instruction,
+                                   repeat=3,
+                                   fail_safe_response="error",
+                                   func_validate=None,
+                                   func_clean_up=None,
+                                   verbose=False): 
+  # prompt = 'GPT-3 Prompt:\n"""\n' + prompt + '\n"""\n'
+  prompt = '"""\n' + prompt + '\n"""\n'
+  prompt += f"Output the response to the prompt above in json. {special_instruction}\n"
+  prompt += "Example output json:\n"
+  prompt += '{"output": "' + str(example_output) + '"}'
+
+  if verbose: 
+    print ("CHAT GPT PROMPT")
+    print (prompt)
+
+  for i in range(repeat): 
+
+    #try: 
+    curr_gpt_response = local_LLM(prompt).strip()
+    end_index = curr_gpt_response.rfind('}') + 1
+    curr_gpt_response = curr_gpt_response[:end_index]
+    curr_gpt_response = json.loads(curr_gpt_response)["output"]
+
+    # print ("---ashdfaf")
+    # print (curr_gpt_response)
+    # print ("000asdfhia")
+    
+    if func_validate(curr_gpt_response, prompt=prompt): 
+      return func_clean_up(curr_gpt_response, prompt=prompt)
+    
+    if verbose: 
+      print ("---- repeat count: \n", i, curr_gpt_response)
+      print (curr_gpt_response)
+      print ("~~~~")
+
+    #except: 
+    #  pass
+
+  return False
+
 
 
 def ChatGPT_safe_generate_response_OLD(prompt, 
@@ -224,6 +272,55 @@ def GPT_request(prompt, gpt_parameter):
     return "TOKEN LIMIT EXCEEDED"
 
 
+### added by Yusuke to run localLLM 18/12/2023
+  
+def local_LLM(prompt, model_param=None): 
+  """
+  Given a prompt and a dictionary of parameters, run LLM text generation and returns the response. 
+  ARGS:
+    prompt: a str prompt
+    model_parameter: a python dictionary with the keys indicating the names of  
+                   the parameter and the values indicating the parameter 
+                   values.   
+  RETURNS: 
+    a str of local_LLM's response. 
+  """
+  # temp_sleep()
+
+  # specify LLM params
+  if model_param is not None:
+    max_new_tokens = model_param["max_tokens"]
+    temperature = model_param["temperature"]
+    
+    # may remove this chuck later, https://discuss.huggingface.co/t/help-with-llama-2-finetuning-setup/50035/8
+    if temperature == 0:
+      do_sample=False
+    else:
+      do_sample=True
+
+  else:
+    max_new_tokens = 100
+    temperature = 0.5
+    do_sample=True
+  
+  #try: 
+  # Loading model and tokenizer
+    
+  ## TODO calling tokenizer and model in every function call may be redundant
+  tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+  model = AutoModelForCausalLM.from_pretrained(checkpoint).to(device) # device_map="auto" distributes LLM accross multiple GPUs (DON'T SET DEVICE MAP FOR TRAINING; ONLY FOR INFERENCING)
+  inputs = tokenizer(prompt, return_tensors="pt").to(device) # Tokenize
+  start_index = inputs["input_ids"].shape[-1]
+  outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, temperature=temperature) # Generate output  
+  generation_output = outputs[0][start_index:]
+
+  return tokenizer.decode(generation_output, skip_special_tokens=True)
+  
+  #except: 
+  #  print ("Local LLM ERROR")
+  #  return "Local LLM ERROR"
+
+
 def generate_prompt(curr_input, prompt_lib_file): 
   """
   Takes in the current input (e.g. comment that you want to classifiy) and 
@@ -263,7 +360,8 @@ def safe_generate_response(prompt,
     print (prompt)
 
   for i in range(repeat): 
-    curr_gpt_response = GPT_request(prompt, gpt_parameter)
+    #curr_gpt_response = GPT_request(prompt, gpt_parameter)
+    curr_gpt_response = local_LLM(prompt, gpt_parameter)
     if func_validate(curr_gpt_response, prompt=prompt): 
       return func_clean_up(curr_gpt_response, prompt=prompt)
     if verbose: 
@@ -273,12 +371,24 @@ def safe_generate_response(prompt,
   return fail_safe_response
 
 
+### written by Yusuke 19/12/2023
+def get_embedding(text):
+  text = text.replace("\n", " ")
+  if not text: 
+    text = "this is blank"
+
+  model = AutoModel.from_pretrained(embedding_checkpoint, trust_remote_code=True).to(device) # trust_remote_code is needed to use the encode method
+  embedding = model.encode([text])[0]
+  return embedding
+
+"""
 def get_embedding(text, model="text-embedding-ada-002"):
   text = text.replace("\n", " ")
   if not text: 
     text = "this is blank"
   return openai.Embedding.create(
           input=[text], model=model)['data'][0]['embedding']
+"""
 
 
 if __name__ == '__main__':

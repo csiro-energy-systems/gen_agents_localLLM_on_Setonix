@@ -6,8 +6,10 @@ Description: Wrapper functions for calling OpenAI APIs.
 """
 import json
 import random
-import openai
 import time 
+
+import openai
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModel
 
 from utils import *
 openai.api_key = openai_api_key
@@ -36,6 +38,69 @@ def ChatGPT_request(prompt):
     print ("ChatGPT ERROR")
     return "ChatGPT ERROR"
 
+
+### added by Yusuke 18/12/2023
+  
+def local_LLM(prompt, model_param=None): 
+  """
+  Given a prompt and a dictionary of parameters, run LLM text generation and returns the response. 
+  ARGS:
+    prompt: a str prompt
+    model_parameter: a python dictionary with the keys indicating the names of  
+                   the parameter and the values indicating the parameter 
+                   values.   
+  RETURNS: 
+    a str of local_LLM's response. 
+  """
+  # temp_sleep()
+
+  # specify LLM params
+  if model_param is not None:
+    max_new_tokens = model_param["max_tokens"]
+    temperature = model_param["temperature"]
+    
+    # may remove this chuck later, https://discuss.huggingface.co/t/help-with-llama-2-finetuning-setup/50035/8
+    if temperature == 0:
+      do_sample=False
+    else:
+      do_sample=True
+
+  else:
+    max_new_tokens = 100
+    temperature = 0.5
+    do_sample=True
+  
+  #try: 
+  # Loading model and tokenizer
+    
+  ## TODO calling tokenizer and model in every function call may be redundant
+  tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+  model = AutoModelForCausalLM.from_pretrained(checkpoint).to(device) # device_map="auto" distributes LLM accross multiple GPUs (DON'T SET DEVICE MAP FOR TRAINING; ONLY FOR INFERENCING)
+  inputs = tokenizer(prompt, return_tensors="pt").to(device) # Tokenize
+  start_index = inputs["input_ids"].shape[-1]
+  outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, temperature=temperature) # Generate output  
+  generation_output = outputs[0][start_index:]
+
+  return tokenizer.decode(generation_output, skip_special_tokens=True)
+  
+  
+  #except: 
+  #  print ("Local LLM ERROR")
+  #  return "Local LLM ERROR"
+
+
+def get_embedding(text):
+  text = text.replace("\n", " ")
+  if not text: 
+    text = "this is blank"
+
+  model = AutoModel.from_pretrained(embedding_checkpoint, trust_remote_code=True).to(device) # trust_remote_code is needed to use the encode method
+  embedding = model.encode([text])[0]
+  return embedding
+
+
+
+
 prompt = """
 ---
 Character 1: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.
@@ -61,16 +126,18 @@ Example output json:
 {"output": "[["Jane Doe", "Hi!"], ["John Doe", "Hello there!"] ... ]"}
 """
 
-print (ChatGPT_request(prompt))
+#device = "cuda" if torch.cuda.is_available() else "cpu"
+gpt_param = {"engine": "text-davinci-003", "max_tokens": 20, 
+             "temperature": 0, "top_p": 1, "stream": False,
+             "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
+
+#print (ChatGPT_request(prompt))
+print (local_LLM(prompt))
+
+#print(get_embedding(prompt))
 
 
-
-
-
-
-
-
-
-
-
-
+#TODO
+# add custom parameters from the original paper so that we do not need to experiment
+# check device 
+# find open source encoder, T5?
