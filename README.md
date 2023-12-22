@@ -8,25 +8,39 @@
 
 This repository accompanies our research paper titled "[Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/abs/2304.03442)." It contains our core simulation module for  generative agents—computational agents that simulate believable human behaviors—and their game environment. Below, we document the steps for setting up the simulation environment on your local machine and for replaying the simulation as a demo animation.
 
+
+## TODO when Yusuke comes back
+- fix the error witt simulation pausing due to LLM not outputting "." at the end of the sentence. This could be fixed with stronger LLM. I did not observe this error with ChatGPT API
+- To extract electricity usage, ensure "environment/frontend_server/compressed_storage/<sim_name>/master_movement.json" has the appropriate json which contains applience and state. We need to create a dataframe with column timestamp, applience(object) and state
+- look into files reflection_trigger currently simulation freezes
+
+
 ## <img src="https://joonsungpark.s3.amazonaws.com:443/static/assets/characters/profile/Isabella_Rodriguez.png" alt="Generative Isabella">   Setting Up the Environment 
 To set up your environment, you will need to generate a `utils.py` file that contains your OpenAI API key and download the necessary packages.
 
 ### Step 1. Generate Utils File
 In the `reverie/backend_server` folder (where `reverie.py` is located), create a new file titled `utils.py` and copy and paste the content below into the file:
 ```
+# Copy and paste your OpenAI API Key
+openai_api_key = "" # keep this empty as we use LocalLLM
 # Put your name
-key_owner = "YusukeM"
+key_owner = "" # keep this empty
 
 # huggingface key to load localLLM
 from huggingface_hub import login
-# Copy and paste your huggingface token
 hf_hey = ""
 login(hf_hey)
-checkpoint = "bigscience/bloom-560m" # "meta-llama/Llama-2-70b-chat-hf"
+checkpoint = "TheBloke/Llama-2-70B-Chat-fp16"  #"bigscience/bloom-560m"
 embedding_checkpoint = "jinaai/jina-embeddings-v2-base-en"
 
+# declare model here so function do not have to call this part everytime
 import torch
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForCausalLM.from_pretrained(checkpoint).to(device) # device_map="auto" distributes LLM accross multiple GPUs (DON'T SET DEVICE MAP FOR TRAINING; ONLY FOR INFERENCING)
+
 
 maze_assets_loc = "../../environment/frontend_server/static_dirs/assets"
 env_matrix = f"{maze_assets_loc}/the_ville/matrix"
@@ -39,8 +53,9 @@ collision_block_id = "32125"
 
 # Verbose 
 debug = True
+
 ```
-Replace `<Your OpenAI API>` with your OpenAI API key, and `<name>` with your name.
+Replace `hf_hey` with your huggingface token.
  
 ### Step 2. Install requirements.txt
 Install everything listed in the `requirements.txt` file (I strongly recommend first setting up a virtualenv as usual). A note on Python version: we tested our environment on Python 3.9.12. 
