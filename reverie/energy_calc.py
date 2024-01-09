@@ -26,7 +26,7 @@ def run_LLM_prompt_appliance_states(descriptions, current_appliance_state, appli
   #  fs = f"{act_game_object} is idle"
   #  return fs
 
-  print ("asdhfapsh8p9hfaiafdsi;ldfj as DEBUG 6") ########
+  #print ("asdhfapsh8p9hfaiafdsi;ldfj as DEBUG 6") ########
   gpt_param = {"engine": "", "max_tokens": 1, # True or False 
                "temperature": 0, "top_p": 1, "stream": False,
                "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
@@ -123,6 +123,7 @@ def calculate_energy(master_movement_file, objects_file):
                 output_data.append({
                     "step": step,
                     "timestamp": adjusted_timestamp,
+                    #"descriptions": descriptions,
                     "appliance": appliance,
                     "state": object_state
                 })          
@@ -130,13 +131,13 @@ def calculate_energy(master_movement_file, objects_file):
         # Update previous state for the next iteration
         previous_state = current_state
 
-    # Write the output to a CSV file using pandas
-    output_file = "energy_output.csv"
-    pd.DataFrame(output_data).to_csv(output_file, index=False)
-
-    print(f"Energy calculation results written to {output_file}")
-
+        # check once in a while
+        if int(step)%100==0:
+          # Write the output to a CSV file using pandas
+          output_file = "energy_output.csv"
+          pd.DataFrame(output_data).to_csv(output_file, index=False)
+          print(f"Energy calculation results written to {output_file}")
 
 # Example usage
-calculate_energy("../environment/frontend_server/compressed_storage/frontend-test2/master_movement.json", "../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks.csv")
+calculate_energy("../environment/frontend_server/compressed_storage/July1_the_ville_isabella_maria_klaus-step-3-20/master_movement.json", "../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv")
 
