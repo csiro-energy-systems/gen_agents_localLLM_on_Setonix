@@ -10,9 +10,21 @@ This repository accompanies our research paper titled "[Generative Agents: Inter
 
 
 ## TODO when Yusuke comes back
-- fix the error witt simulation pausing due to LLM not outputting "." at the end of the sentence. This could be fixed with stronger LLM. I did not observe this error with ChatGPT API
+- done, fix the error witt simulation pausing due to LLM not outputting "." at the end of the sentence. This could be fixed with stronger LLM. I did not observe this error with ChatGPT API
+https://github.com/joonspk-research/generative_agents/issues/92 
+https://github.com/joonspk-research/generative_agents/issues/79
+https://github.com/joonspk-research/generative_agents/issues/91
+https://github.com/joonspk-research/generative_agents/issues/111
+
+- done, no such file or directory movement/0.json
+https://github.com/joonspk-research/generative_agents/issues/59
+
+- on vanillavm, fix the issue of front end not responding to movement/*.json. 
+https://github.com/joonspk-research/generative_agents/issues/93 -> This issue occurs as backend server is not initialised. You need to run python managem runserver everytime you want to run reverie.py
+https://github.com/joonspk-research/generative_agents/issues/15
+
 - To extract electricity usage, ensure "environment/frontend_server/compressed_storage/<sim_name>/master_movement.json" has the appropriate json which contains applience and state. We need to create a dataframe with column timestamp, applience(object) and state
-- look into files reflection_trigger currently simulation freezes
+- try mistral 8x7b by using the special offloading 
 
 
 ## <img src="https://joonsungpark.s3.amazonaws.com:443/static/assets/characters/profile/Isabella_Rodriguez.png" alt="Generative Isabella">   Setting Up the Environment 

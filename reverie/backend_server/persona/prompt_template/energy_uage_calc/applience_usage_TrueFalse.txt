@@ -7,54 +7,7 @@ Variables:
 !<INPUT 2>! -- appliance to check whether it is on use or not 
 
 <commentblockmarker>###</commentblockmarker>
-Task: We want to understand the state of an appliance based on the descriptions of people which contain location, object, and action
-
----
-Example 1:
-Context: 
-  - Description: Isabella Rodriguez is sleeping at the Ville:Johnson Park:park:park garden
-  - Previous State: {'bed': True, 'desk': False, 'kitchen_sink': False, ...}
-  - Appliance to check: 'kitchen_sink'
-
-Factor 1: Is the kitchen sink in use in the previous state?
-
-Factor 2: Describe the kitchen sink's state using Isabella Rodriguez's action. Has Isabella Rodriguez's action affected the state of the kitchen sink?
-
-Factor 3: Based on Question 1 and Question 2, determine whether the kitchen sink is in use or not. Output 'True' if it is in use, 'False' if not.
-
-Answer: False
-
----
-Example 2:
-Context: 
-  - Description: Klaus Mueller is sleeping at the Ville:Johnson Park:park:park garden
-  - Previous State: {'bed': True, 'desk': False, 'kitchen_sink': False, ...}
-  - Appliance to check: 'bed'
-
-Factor 1: Is the bed in use in the previous state?
-
-Factor 2: Describe the bed's state using Klaus Mueller's action. Has Klaus Mueller's action affected the state of the bed?
-
-Factor 3: Based on Question 1 and Question 2, determine whether the bed is in use or not. Output 'True' if it is in use, 'False' if not.
-
-Answer: True
-
----
-Example 3:
-Context: 
-  - Description: Maria Lopez is working on her physics degree and streaming games on Twitch at the Ville:Johnson Park:park:park garden
-  - Previous State: {'bed': True, 'desk': True, 'kitchen_sink': False, ...}
-  - Appliance to check: 'computer'
-
-Factor 1: Is the computer in use in the previous state?
-
-Factor 2: Describe the computer's state using Maria Lopez's action. Has Maria Lopez's action affected the state of the computer?
-
-Factor 3: Based on Question 1 and Question 2, determine whether the computer is in use or not. Output 'True' if it is in use, 'False' if not.
-
-Answer : True
-
-
+Task: We want to understand the state of an appliance based on the descriptions of people which contain location, object, and action. ONLY ANSWER IN EITHER 'True' OR 'False'
 
 ---
 Let's think. 
@@ -69,6 +22,8 @@ Factor 1: Based on !<INPUT 1>!, Has !<INPUT 2>! been used in the previous state?
 
 Factor 2: Describe the !<INPUT 2>!'s state using !<INPUT 0>!. Has the !<INPUT 0>! affected the state of !<INPUT 2>!?
 
-Factor 3: Based on Step 1 and Step 2, determine whether the !<INPUT 2>! is in use or not. Output 'True' if it is in use, 'False' if not
+Factor 3: Based on Step 1 and Step 2, determine whether the !<INPUT 2>! is in use or not. 
+
+ONLY ANSWER IN EITHER 'True' OR 'False'
 
 Answer:

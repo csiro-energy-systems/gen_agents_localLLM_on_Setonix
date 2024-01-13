@@ -1,5 +1,14 @@
+
+
+import os
+import json
+import csv
+from datetime import datetime, timedelta
+import re
 import sys
 sys.path.append('backend_server')
+
+import pandas as pd
 
 from persona.prompt_template.gpt_structure import *
 
@@ -10,10 +19,24 @@ def run_LLM_prompt_appliance_states(descriptions, current_appliance_state, appli
                     appliance]
     return prompt_input
   
-  def __func_clean_up(gpt_response, prompt=""):
-    cr = gpt_response.strip()
-    if cr[-1] == ".": cr = cr[:-1]
-    return cr
+  def __func_clean_up(response, prompt=""):
+      # Split the response into words
+      words = response.split()
+
+      # Get the last word and convert it to lowercase
+      last_word = words[-1].lower()
+
+      # Check if the last word is either 'true' or 'false'
+      if last_word == 'true':
+          print('trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+          return True
+      elif last_word == 'false':
+          print('falseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+          return False
+      else:
+          return None  # If the last word is not 'True' or 'False'
+
+
 
   def __func_validate(gpt_response, prompt=""): 
     try: 
@@ -27,7 +50,7 @@ def run_LLM_prompt_appliance_states(descriptions, current_appliance_state, appli
   #  return fs
 
   #print ("asdhfapsh8p9hfaiafdsi;ldfj as DEBUG 6") ########
-  gpt_param = {"engine": "", "max_tokens": 1, # True or False 
+  gpt_param = {"engine": "", "max_tokens": 2, # True or False, use 200 if explanation is required 
                "temperature": 0, "top_p": 1, "stream": False,
                "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
   prompt_template = "backend_server/persona/prompt_template/energy_uage_calc/applience_usage_TrueFalse.txt" ########
@@ -41,7 +64,7 @@ def run_LLM_prompt_appliance_states(descriptions, current_appliance_state, appli
   #prompt += "Example output json:\n"
   #prompt += '{"output": "' + str(example_output) + '"}'
   
-  fail_safe = "energy usage not generated correctly" ########
+  fail_safe = "unknown" ########
   #output = ChatGPT_safe_generate_response(prompt, example_output, special_instruction, 3, fail_safe,
   #                                        __chat_func_validate, __chat_func_clean_up, True)
   #print(prompt)
@@ -51,13 +74,7 @@ def run_LLM_prompt_appliance_states(descriptions, current_appliance_state, appli
   return output
   #if output != False: 
   #  return output, [output, prompt, gpt_param, prompt_input, fail_safe]
-  
 
-import os
-import json
-import csv
-from datetime import datetime, timedelta
-import pandas as pd
 
 def load_appliances(objects_file):
     # Load the CSV file with object information
@@ -114,6 +131,7 @@ def calculate_energy(master_movement_file, objects_file):
         
         for appliance in initial_state.keys():
             
+            # LLM
             object_state = run_LLM_prompt_appliance_states(descriptions, current_state, appliance)
             print(object_state)
             
