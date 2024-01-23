@@ -103,8 +103,12 @@ class MemoryTree:
 
     try: 
       x = ", ".join(list(self.tree[curr_world][curr_sector][curr_arena]))
-    except: 
-      x = ", ".join(list(self.tree[curr_world][curr_sector][curr_arena.lower()]))
+    except KeyError:
+      try:
+          x = ", ".join(list(self.tree[curr_world][curr_sector][curr_arena.lower()]))
+      except KeyError:
+          print(f"KeyError: '{curr_arena}' not found in spatial memory.")
+          x = ""
     return x
 
 

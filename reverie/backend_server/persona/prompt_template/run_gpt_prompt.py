@@ -718,10 +718,10 @@ def run_gpt_prompt_action_arena(action_description,
   output = safe_generate_response(prompt, gpt_param, 5, fail_safe,
                                    __func_validate, __func_clean_up)
   print (output)
-  # y = f"{act_world}:{act_sector}"
-  # x = [i.strip() for i in persona.s_mem.get_str_accessible_sector_arenas(y).split(",")]
-  # if output not in x: 
-  #   output = random.choice(x)
+  y = f"{act_world}:{act_sector}"
+  x = [i.strip() for i in persona.s_mem.get_str_accessible_sector_arenas(y).split(",")]
+  if output not in x: 
+    output = random.choice(x)
 
   if debug or verbose: 
     print_run_prompts(prompt_template, persona, gpt_param, 
@@ -2904,13 +2904,21 @@ def run_gpt_generate_safety_score(persona, comment, test_input=None, verbose=Fal
   prompt = generate_prompt(prompt_input, prompt_template)
   print (prompt)
   fail_safe = get_fail_safe() 
-  output = ChatGPT_safe_generate_response_OLD(prompt, 3, fail_safe,
-                        __chat_func_validate, __chat_func_clean_up, verbose)
-  print (output)
+  #output = ChatGPT_safe_generate_response_OLD(prompt, 3, fail_safe,
+  #                      __chat_func_validate, __chat_func_clean_up, verbose)
+  
+  
+  
+  
   
   gpt_param = {"engine": "text-davinci-003", "max_tokens": 50, 
                "temperature": 0, "top_p": 1, "stream": False,
                "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
+  
+  output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
+                                   __chat_func_validate, __chat_func_clean_up)
+  print (output)
+
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]
 
 
@@ -2980,6 +2988,9 @@ def run_gpt_generate_iterative_chat_utt(maze, init_persona, target_persona, retr
 
   def __chat_func_clean_up(gpt_response, prompt=""): 
     gpt_response = extract_first_json_dict(gpt_response)
+    # gpt_response is None, what if the response is None
+    # print to indicate it outputted None and handle error accrodingly
+    # check the paper and see why node and embedding is not added. It should add something in plan and reflect
 
     cleaned_dict = dict()
     cleaned = []
@@ -3019,13 +3030,18 @@ def run_gpt_generate_iterative_chat_utt(maze, init_persona, target_persona, retr
   prompt = generate_prompt(prompt_input, prompt_template)
   print (prompt)
   fail_safe = get_fail_safe() 
-  output = ChatGPT_safe_generate_response_OLD(prompt, 3, fail_safe,
-                        __chat_func_validate, __chat_func_clean_up, verbose)
-  print (output)
+  #output = ChatGPT_safe_generate_response_OLD(prompt, 3, fail_safe,
+  #                      __chat_func_validate, __chat_func_clean_up, verbose)
+  
   
   gpt_param = {"engine": "text-davinci-003", "max_tokens": 50, 
                "temperature": 0, "top_p": 1, "stream": False,
                "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
+  
+  output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
+                                   __chat_func_validate, __chat_func_clean_up)
+  
+  print (output)
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]
 
 
