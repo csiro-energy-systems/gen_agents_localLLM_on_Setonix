@@ -17,8 +17,17 @@ from energy.energy_calc_string_match import calculate_energy
 
 # simcodes
 files = [
-    "July1_the_ville_isabella_maria_klaus-step-3-21",
-    "July1_the_ville_isabella_maria_klaus-step-3-20"
+    #"July1_the_ville_isabella_maria_klaus-step-3-20",
+    #"llama2-13b",
+    #"mistral-7b-1",
+    #"mistral-7b-2",
+    #"mistral-7b-3",
+    #"mistral_debug",
+    #"mistral-7b-eco-1",
+    #"mistral-7b-eco-2",
+    "mistral-7b-n5-1",
+    "mistral-7b-n5-2",
+    "mistral-7b-n5-3",
 ]
 
 object_file ="../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv"
@@ -36,24 +45,23 @@ for file in files:
     dir_name = os.path.splitext(os.path.basename(file))[0]
     
     # Check if the directory exists
-    if os.path.exists(os.path.join(compressed_dir, dir_name)):
-        # If the directory exists, construct the path to master_movement.json
-        master_json_path = os.path.join(compressed_dir, dir_name, "master_movement.json")
-        print(master_json_path)
-
-        # Check if master_movement.json exists
-        if os.path.exists(master_json_path):                
-            # Now you can use master_json for further processing
-            data = calculate_energy(master_json_path, object_file)
-            
-            
-            
-        else:
-            print(f"master_movement.json not found in directory: {dir_name}")
-    else:
+    if not os.path.exists(os.path.join(compressed_dir, dir_name)):
         ## compress simulations
         compress4energy(file)
 
+    # If the directory exists, construct the path to master_movement.json
+    master_json_path = os.path.join(compressed_dir, dir_name, "master_movement.json")
+    print(master_json_path)
+
+    # Check if master_movement.json exists
+    if os.path.exists(master_json_path):                
+        # Now you can use master_json for further processing
+        data = calculate_energy(master_json_path, object_file)
+        
+        
+        
+    else:
+        print(f"master_movement.json not found in directory: {dir_name}")
 
     # Convert the data to a DataFrame
     df = pd.DataFrame(data)
@@ -74,44 +82,33 @@ combined_data = pd.concat(total_usage_array, axis=0)
 # Print rows where 'state' is equal to 3
 print(combined_data)
       
-# Calculate mean for each timestamp
+# Calculate rolling mean and standard deviation for each timestamp
+window_size = 360
 mean_values = combined_data.groupby('step')['state'].mean().reset_index()
+mean_values['rolling_mean'] = mean_values['state'].rolling(window=window_size).mean().fillna(0)
 std_values = combined_data.groupby('step')['state'].std().reset_index()
-print(mean_values)
+std_values['rolling_std'] = std_values['state'].rolling(window=window_size).std().fillna(0)
 
 # Plotting mean values
 plt.figure(figsize=(10, 6))
-plt.plot(mean_values['step'], mean_values['state'], label='Mean', color='blue')
+plt.plot(mean_values['step'], mean_values['rolling_mean'], label='Mean', color='blue')
 
 # Convert 'step' column to numeric
 mean_values['step'] = pd.to_numeric(mean_values['step'])
+
 # Calculate adjusted timestamp
 current_time = datetime.strptime('00:00:00', '%H:%M:%S')
 
-# TODO, this is super redundant. Do vector operation
-'''
-adjusted_timestamps = []
-
-for step in mean_values['step']:
-    adjusted_timestamp = (current_time + timedelta(seconds=step * 10)).strftime('%H:%M:%S')
-    adjusted_timestamps.append(adjusted_timestamp)
-
-# Add the adjusted_timestamps list to the mean_values DataFrame
-mean_values['adjusted_timestamp'] = adjusted_timestamps
-'''
-
-#mean_values['adjusted_timestamp'] = (current_time + timedelta(seconds=mean_values['step'] * 10)).dt.strftime('%H:%M:%S')
-
 plt.fill_between(mean_values['step'],
-                 mean_values['state'] - std_values['state'],
-                 mean_values['state'] + std_values['state'],
+                 mean_values['rolling_mean'] - std_values['rolling_std'],
+                 mean_values['rolling_mean'] + std_values['rolling_std'],
                  color='lightgray', label='± 1 Std Dev', alpha=0.5)
 
-plt.title('Time Series Plot with Mean and Standard Deviation')
-plt.xlabel('Timestamp')
-plt.ylabel('State')
+# Additional plot settings
+plt.xlabel('Step')
+plt.ylabel('Mean +/- 1 Std Dev')
+plt.title('Moving Average with Standard Deviation')
 plt.legend()
-plt.grid(True)
 
 # Save the figure to a file (adjust the filename and format as needed)
 plt.savefig('time_series_plot.png')
