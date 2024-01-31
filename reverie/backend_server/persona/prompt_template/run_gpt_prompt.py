@@ -396,11 +396,15 @@ def run_gpt_prompt_task_decomp(persona,
       i_task = i[0] 
       i_duration = i[1]
 
-      i_duration -= (i_duration % 5)
-      if i_duration > 0: 
+      # below 3 lines are added to ensure to pass the case where all the tasks are less than 5 mins
+      if i_duration <= 5: 
         for j in range(i_duration): 
-          curr_min_slot += [(i_task, count)]       
-    curr_min_slot = curr_min_slot[1:]   
+          curr_min_slot += [(i_task, count)]  
+      elif i_duration > 5: 
+        i_duration -= (i_duration % 5)
+        for j in range(i_duration): 
+          curr_min_slot += [(i_task, count)]      
+    curr_min_slot = curr_min_slot[1:]  # remove dummy data
 
     if len(curr_min_slot) > total_expected_min: 
       last_task = curr_min_slot[60]
@@ -408,6 +412,7 @@ def run_gpt_prompt_task_decomp(persona,
         curr_min_slot[-1 * i] = last_task
     elif len(curr_min_slot) < total_expected_min: 
       last_task = curr_min_slot[-1]
+      # this implementation creates an unrealistic case such as e.g. locking the door to leave the house 25mins
       for i in range(total_expected_min - len(curr_min_slot)):
         curr_min_slot += [last_task]
 
@@ -462,9 +467,11 @@ def run_gpt_prompt_task_decomp(persona,
   # print (prompt_input)
   # print (prompt)
   print (output)
+  # [['watching TV', 180]]
 
   fin_output = []
   time_sum = 0
+  '''
   for i_task, i_duration in output: 
     time_sum += i_duration
     # HM?????????
@@ -473,14 +480,25 @@ def run_gpt_prompt_task_decomp(persona,
       fin_output += [[i_task, i_duration]]
     else: 
       break
+      
   ftime_sum = 0
   for fi_task, fi_duration in fin_output: 
-    ftime_sum += fi_duration
-  
+  ftime_sum += fi_duration
+
   # print ("for debugging... line 365", fin_output)
   fin_output[-1][1] += (duration - ftime_sum)
-  output = fin_output 
+  '''
 
+  for i_task, i_duration in output:
+    if time_sum + i_duration <= duration:
+      fin_output.append([i_task, i_duration])
+      time_sum += i_duration
+    else:
+      remaining_duration = duration - time_sum
+      fin_output.append([i_task, remaining_duration])
+      break
+
+  output = fin_output 
 
 
   task_decomp = output
@@ -1248,7 +1266,7 @@ def run_gpt_prompt_new_decomp_schedule(persona,
                                      test_input)
   prompt = generate_prompt(prompt_input, prompt_template)
   fail_safe = get_fail_safe(main_act_dur, truncated_act_dur)
-  output = safe_generate_response(prompt, gpt_param, 5, fail_safe,
+  output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
                                    __func_validate, __func_clean_up)
   
   # print ("* * * * output")
@@ -2991,6 +3009,13 @@ def run_gpt_generate_iterative_chat_utt(maze, init_persona, target_persona, retr
     # gpt_response is None, what if the response is None
     # print to indicate it outputted None and handle error accrodingly
     # check the paper and see why node and embedding is not added. It should add something in plan and reflect
+
+    # yusuke debug 24/01/24
+    print(gpt_response)
+    if gpt_response is None:
+      print('gpt_response is None, outputting pre-set sentence to keep the program running')
+      cleaned_dict = {'utterance': 'Thanks', 'end': True}
+      return cleaned_dict
 
     cleaned_dict = dict()
     cleaned = []
