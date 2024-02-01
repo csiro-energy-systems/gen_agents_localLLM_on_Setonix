@@ -17,24 +17,21 @@ from energy.energy_calc_string_match import calculate_energy
 
 # simcodes
 files = [
-    "July1_the_ville_isabella_maria_klaus-step-3-20",
-    #"July1_the_ville_isabella_maria_klaus-step-3-21"
-    #"llama2-13b",
-    #"mistral-7b-1",
-    #"mistral-7b-2",
-    #"mistral-7b-3",
-    #"mistral_debug",
-    #"mistral-7b-eco-1",
-    #"mistral-7b-eco-2",
+    #"mistral-7b-n5-1",
+    #"mistral-7b-n5-2",
+    #"mistral-7b-n5-3",
+    #"mistral-7b-n5-4",
+    #"mistral-7b-n5-5",
+    #"mistral-7b-n5-6",
 ]
 
 object_file ="../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv"
 
 # data_array = []  # If you need to store individual dataframes
 total_usage_array = []
-person_usage_array = []
-isabella_usage_array = []
-maria_klaus_usage_array = []
+#person_usage_array = []
+lin_house_usage_array = []
+moreno_house_usage_array = []
 
 for file in files:
 
@@ -70,9 +67,10 @@ for file in files:
     
     # calculate per person 
     person_usage_per_step = df.groupby(['step', 'person'])['state'].sum().reset_index()
-    isabella_usage = person_usage_per_step[person_usage_per_step['person'].isin(['Isabella Rodriguez'])]
-    # Filter person_usage_per_step for Maria Lopez and Klaus Mueller
-    maria_klaus_usage = person_usage_per_step[person_usage_per_step['person'].isin(['Maria Lopez', 'Klaus Mueller'])]
+    # Filter 
+    lin_house_usage = person_usage_per_step[person_usage_per_step['person'].isin(['Eddy Lin', 'John Lin', 'Mei Lin'])]
+    
+    moreno_house_usage = person_usage_per_step[person_usage_per_step['person'].isin(['Tom Moreno', 'Jane Moreno'])]
 
 
     # Append the data to the total_usage_array or perform other operations
@@ -80,31 +78,32 @@ for file in files:
     print(total_usage_per_step)
 
     #person_usage_array.append(person_usage_per_step)
-    isabella_usage_array.append(isabella_usage)
-    maria_klaus_usage_array.append(maria_klaus_usage)
+    lin_house_usage_array.append(lin_house_usage)
+    moreno_house_usage_array.append(moreno_house_usage)
     total_usage_array.append(total_usage_per_step)
-    
+
+
 # Concatenate the total_usage arrays into a single dataframe
-isabella_total = pd.concat(isabella_usage_array, axis=0)
-maria_klaus_total = pd.concat(maria_klaus_usage_array, axis=0)
+lin_house_total = pd.concat(lin_house_usage_array, axis=0)
+moreno_house_total = pd.concat(moreno_house_usage_array, axis=0)
 combined_data_total = pd.concat(total_usage_array, axis=0)
 
 # Print rows where 'state' is equal to 3
 print(combined_data_total)
 
 # Calculate rolling mean and standard deviation for each timestamp
-# 10s per step, 6 is 1 min, 60 is 10 mins, 360 is 1hr 
+# 10s per step, 6 is 1 min, 60 is 10 mins, 360 is 1hr
 window_size = 60
 
-isabella_mean_values = isabella_total.groupby('step')['state'].mean().reset_index()
-isabella_mean_values['rolling_mean'] = isabella_mean_values['state'].rolling(window=window_size).mean().fillna(0)
-isabella_std_values = isabella_total.groupby('step')['state'].std().reset_index()
-isabella_std_values['rolling_std'] = isabella_std_values['state'].rolling(window=window_size).std().fillna(0)
+lin_house_mean_values = lin_house_total.groupby('step')['state'].mean().reset_index()
+lin_house_mean_values['rolling_mean'] = lin_house_mean_values['state'].rolling(window=window_size).mean().fillna(0)
+lin_house_std_values = lin_house_total.groupby('step')['state'].std().reset_index()
+lin_house_std_values['rolling_std'] = lin_house_std_values['state'].rolling(window=window_size).std().fillna(0)
 
-maria_klaus_mean_values = maria_klaus_total.groupby('step')['state'].mean().reset_index()
-maria_klaus_mean_values['rolling_mean'] = maria_klaus_mean_values['state'].rolling(window=window_size).mean().fillna(0)
-maria_klaus_std_values = maria_klaus_total.groupby('step')['state'].std().reset_index()
-maria_klaus_std_values['rolling_std'] = maria_klaus_std_values['state'].rolling(window=window_size).std().fillna(0)
+moreno_house_mean_values = moreno_house_total.groupby('step')['state'].mean().reset_index()
+moreno_house_mean_values['rolling_mean'] = moreno_house_mean_values['state'].rolling(window=window_size).mean().fillna(0)
+moreno_house_std_values = moreno_house_total.groupby('step')['state'].std().reset_index()
+moreno_house_std_values['rolling_std'] = moreno_house_std_values['state'].rolling(window=window_size).std().fillna(0)
 
 mean_values = combined_data_total.groupby('step')['state'].mean().reset_index()
 mean_values['rolling_mean'] = mean_values['state'].rolling(window=window_size).mean().fillna(0)
@@ -114,28 +113,28 @@ std_values['rolling_std'] = std_values['state'].rolling(window=window_size).std(
 # Plotting mean values
 plt.figure(figsize=(15, 10))
 
-# Subplot for Isabella
+# Subplot for Lin House
 plt.subplot(3, 1, 1)
-isabella_total.groupby('step')['state'].sum().plot(label='Isabella', color='green')
-plt.plot(isabella_mean_values['step'], isabella_mean_values['rolling_mean'], label='Mean', color='blue')
-plt.fill_between(isabella_mean_values['step'],
-                 isabella_mean_values['rolling_mean'] - isabella_std_values['rolling_std'],
-                 isabella_mean_values['rolling_mean'] + isabella_std_values['rolling_std'],
+lin_house_total.groupby('step')['state'].sum().plot(label='Lin House', color='green')
+plt.plot(lin_house_mean_values['step'], lin_house_mean_values['rolling_mean'], label='Mean', color='blue')
+plt.fill_between(lin_house_mean_values['step'],
+                 lin_house_mean_values['rolling_mean'] - lin_house_std_values['rolling_std'],
+                 lin_house_mean_values['rolling_mean'] + lin_house_std_values['rolling_std'],
                  color='lightgray', label='± 1 Std Dev', alpha=0.5)
-plt.title('Isabella Total Usage')
+plt.title('Lin House Total Usage')
 plt.xlabel('Step')
 plt.ylabel('Total State')
 plt.legend()
 
-# Subplot for Maria and Klaus
+# Subplot for Moreno House
 plt.subplot(3, 1, 2)
-maria_klaus_total.groupby('step')['state'].sum().plot(label='Maria and Klaus', color='orange')
-plt.plot(maria_klaus_mean_values['step'], maria_klaus_mean_values['rolling_mean'], label='Mean', color='blue')
-plt.fill_between(maria_klaus_mean_values['step'],
-                 maria_klaus_mean_values['rolling_mean'] - maria_klaus_std_values['rolling_std'],
-                 maria_klaus_mean_values['rolling_mean'] + maria_klaus_std_values['rolling_std'],
+moreno_house_total.groupby('step')['state'].sum().plot(label='Moreno House', color='orange')
+plt.plot(moreno_house_mean_values['step'], moreno_house_mean_values['rolling_mean'], label='Mean', color='blue')
+plt.fill_between(moreno_house_mean_values['step'],
+                 moreno_house_mean_values['rolling_mean'] - moreno_house_std_values['rolling_std'],
+                 moreno_house_mean_values['rolling_mean'] + moreno_house_std_values['rolling_std'],
                  color='lightgray', label='± 1 Std Dev', alpha=0.5)
-plt.title('Maria and Klaus Total Usage')
+plt.title('Moreno House Total Usage')
 plt.xlabel('Step')
 plt.ylabel('Total State')
 plt.legend()
