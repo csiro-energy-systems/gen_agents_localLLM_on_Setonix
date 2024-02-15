@@ -21,19 +21,22 @@ files = [
     "mistral-7b-2",
     "mistral-7b-3",
     "mistral_debug",
-    "mistral-7b-eco-1",
-    "mistral-7b-eco-2",
+    "mistral-7b-4",
+    "mistral-7b-5",
+    "mistral-7b-6",
     "mistral-7b-n5-1",
     "mistral-7b-n5-2",
     "mistral-7b-n5-3",
-    #"mistral-7b-n5-4",
-    #"mistral-7b-n5-5",
-    #"mistral-7b-n5-6",
-    
+    "mistral-7b-n5-4",
+    "mistral-7b-n5-5",
+    "mistral-7b-n5-6",
 ]
 
 # 10s per step, 6 is 1 min, 60 is 10 mins, 360 is 1hr 
 window_size = 360
+
+# fontsize of the plot
+font_size = 20
 
 object_file ="../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv"
 
@@ -102,23 +105,28 @@ mean_values['rolling_mean'] = mean_values['state'].rolling(window=window_size).m
 std_values = combined_data_total.groupby('step')['state'].std().reset_index()
 std_values['rolling_std'] = std_values['state'].rolling(window=window_size).std().fillna(0)
 
-# Plotting mean values
-plt.figure(figsize=(15, 10))
+# Convert 'step' values to hours
+mean_values['hours'] = mean_values['step'] * 10 / 3600
 
+# Plotting mean values
+plt.figure(figsize=(12, 8))
 
 # Subplot for Combined Data
-plt.plot(mean_values['step'], mean_values['rolling_mean'], label='Mean', color='blue')
-plt.fill_between(mean_values['step'],
+plt.plot(mean_values['hours'], mean_values['rolling_mean'], label='Mean', color='blue')
+plt.fill_between(mean_values['hours'],
                  mean_values['rolling_mean'] - std_values['rolling_std'],
                  mean_values['rolling_mean'] + std_values['rolling_std'],
                  color='lightgray', label='± 1 Std Dev', alpha=0.5)
-plt.title('Combined Data Moving Average with Standard Deviation')
-plt.xlabel('Step')
-plt.ylabel('Mean +/- 1 Std Dev')
-plt.legend()
+plt.title('Aggregated Mean of All Household Daily Usage', fontsize=font_size)
+plt.xlabel('Hours', fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.ylabel('State of Appliances', fontsize=font_size)
+plt.yticks(fontsize=font_size)
+plt.ylim(top=0.85)   # Set y-axis limits
+plt.legend(fontsize=font_size, loc='upper left')
 
 # Adjust layout
 plt.tight_layout()
 
 # Save the figure to a file (adjust the filename and format as needed)
-plt.savefig('time_series_plot.png')
+plt.savefig('time_series_plot.pdf')

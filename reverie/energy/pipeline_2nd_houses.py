@@ -17,13 +17,19 @@ from energy.energy_calc_string_match import calculate_energy
 
 # simcodes
 files = [
-    #"mistral-7b-n5-1",
-    #"mistral-7b-n5-2",
-    #"mistral-7b-n5-3",
-    #"mistral-7b-n5-4",
-    #"mistral-7b-n5-5",
-    #"mistral-7b-n5-6",
+    "mistral-7b-n5-1",
+    "mistral-7b-n5-2",
+    "mistral-7b-n5-3",
+    "mistral-7b-n5-4",
+    "mistral-7b-n5-5",
+    "mistral-7b-n5-6",
 ]
+
+# 10s per step, 6 is 1 min, 60 is 10 mins, 360 is 1hr
+window_size = 360
+
+# fontsize of the plot
+font_size = 20
 
 object_file ="../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv"
 
@@ -92,8 +98,6 @@ combined_data_total = pd.concat(total_usage_array, axis=0)
 print(combined_data_total)
 
 # Calculate rolling mean and standard deviation for each timestamp
-# 10s per step, 6 is 1 min, 60 is 10 mins, 360 is 1hr
-window_size = 60
 
 lin_house_mean_values = lin_house_total.groupby('step')['state'].mean().reset_index()
 lin_house_mean_values['rolling_mean'] = lin_house_mean_values['state'].rolling(window=window_size).mean().fillna(0)
@@ -110,49 +114,59 @@ mean_values['rolling_mean'] = mean_values['state'].rolling(window=window_size).m
 std_values = combined_data_total.groupby('step')['state'].std().reset_index()
 std_values['rolling_std'] = std_values['state'].rolling(window=window_size).std().fillna(0)
 
+# Convert 'step' values to hours
+lin_house_mean_values['hours'] = lin_house_mean_values['step'] * 10 / 3600
+moreno_house_mean_values['hours'] = moreno_house_mean_values['step'] * 10 / 3600
+mean_values['hours'] = mean_values['step'] * 10 / 3600
+
 # Plotting mean values
 plt.figure(figsize=(15, 10))
 
 # Subplot for Lin House
-plt.subplot(3, 1, 1)
-lin_house_total.groupby('step')['state'].sum().plot(label='Lin House', color='green')
-plt.plot(lin_house_mean_values['step'], lin_house_mean_values['rolling_mean'], label='Mean', color='blue')
-plt.fill_between(lin_house_mean_values['step'],
-                 lin_house_mean_values['rolling_mean'] - lin_house_std_values['rolling_std'],
-                 lin_house_mean_values['rolling_mean'] + lin_house_std_values['rolling_std'],
-                 color='lightgray', label='± 1 Std Dev', alpha=0.5)
-plt.title('Lin House Total Usage')
-plt.xlabel('Step')
-plt.ylabel('Total State')
-plt.legend()
+plt.subplot(2, 1, 1)
+plt.plot(lin_house_mean_values['hours'], lin_house_mean_values['rolling_mean'], label='Mean', color='blue')
+#plt.fill_between(lin_house_mean_values['hours'],
+#                 lin_house_mean_values['rolling_mean'] - lin_house_std_values['rolling_std'],
+#                 lin_house_mean_values['rolling_mean'] + lin_house_std_values['rolling_std'],
+#                 color='lightgray', label='± 1 Std Dev', alpha=0.5)
+plt.title('Lin Household Daily Usage', fontsize=font_size)
+plt.xlabel('Hours', fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.ylabel('State of Appliances', fontsize=font_size)
+plt.yticks(fontsize=font_size)
+plt.ylim(top=0.85)   # Set y-axis limits
+#plt.legend(fontsize=font_size)
 
 # Subplot for Moreno House
-plt.subplot(3, 1, 2)
-moreno_house_total.groupby('step')['state'].sum().plot(label='Moreno House', color='orange')
-plt.plot(moreno_house_mean_values['step'], moreno_house_mean_values['rolling_mean'], label='Mean', color='blue')
-plt.fill_between(moreno_house_mean_values['step'],
-                 moreno_house_mean_values['rolling_mean'] - moreno_house_std_values['rolling_std'],
-                 moreno_house_mean_values['rolling_mean'] + moreno_house_std_values['rolling_std'],
-                 color='lightgray', label='± 1 Std Dev', alpha=0.5)
-plt.title('Moreno House Total Usage')
-plt.xlabel('Step')
-plt.ylabel('Total State')
-plt.legend()
-
+plt.subplot(2, 1, 2)
+plt.plot(moreno_house_mean_values['hours'], moreno_house_mean_values['rolling_mean'], label='Mean', color='blue')
+#plt.fill_between(moreno_house_mean_values['hours'],
+#                 moreno_house_mean_values['rolling_mean'] - moreno_house_std_values['rolling_std'],
+#                 moreno_house_mean_values['rolling_mean'] + moreno_house_std_values['rolling_std'],
+#                 color='lightgray', label='± 1 Std Dev', alpha=0.5)
+plt.title('Moreno Household Daily Usage', fontsize=font_size)
+plt.xlabel('Hours', fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.ylabel('State of Appliances', fontsize=font_size)
+plt.yticks(fontsize=font_size)
+plt.ylim(top=0.85)   # Set y-axis limits
+#plt.legend(fontsize=font_size)
+'''
 # Subplot for Combined Data
 plt.subplot(3, 1, 3)
-plt.plot(mean_values['step'], mean_values['rolling_mean'], label='Mean', color='blue')
-plt.fill_between(mean_values['step'],
+plt.plot(mean_values['hours'], mean_values['rolling_mean'], label='Mean', color='blue')
+plt.fill_between(mean_values['hours'],
                  mean_values['rolling_mean'] - std_values['rolling_std'],
                  mean_values['rolling_mean'] + std_values['rolling_std'],
                  color='lightgray', label='± 1 Std Dev', alpha=0.5)
 plt.title('Combined Data Moving Average with Standard Deviation')
-plt.xlabel('Step')
+plt.xlabel('Hours')
 plt.ylabel('Mean +/- 1 Std Dev')
 plt.legend()
-
+'''
 # Adjust layout
 plt.tight_layout()
 
 # Save the figure to a file (adjust the filename and format as needed)
-plt.savefig('time_series_plot.png')
+plt.savefig('time_series_plot_lin_moreno.pdf')
+plt.savefig('time_series_plot_lin_moreno.png')
