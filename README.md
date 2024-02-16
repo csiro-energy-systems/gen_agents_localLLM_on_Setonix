@@ -130,7 +130,7 @@ For Customisation of the simulation, Please refer to the original repo https://g
 
 ## ⚡ Plotting Daily Energy Consumption
 All the files related to energy consumption extraction can be found in `reverie/energy`
-Similarly, the generated data simulation data from the experiment is stored in `C:\Users\miy012\generative_agents_localLLM\environment\frontend_server\compressed_storage` in Optimus
+Similarly, the generated data simulation data from the experiment is stored in `C:\Users\miy012\generative_agents_localLLM\environment\frontend_server\compressed_storage` in Optimus. The downloaded folder `compressed_storage` can also be found in the shared folder in the MSteams project "Safe Synthetic Data with GenAI"
 
 
 ### Real Dataset
