@@ -147,6 +147,8 @@ Similarly, the generated data simulation data from the experiment is stored in `
 
 For this experiment, the data has been downloaded in Optimus and the plot is generated on `reverie/backend_server/plots.ipynb`
 
+![Smart Grid Image](reverie/energy/smart_city.png)
+
 ### Plot synthetic data from simulaton
 Navigate to `reverie/energy` and run `python pipeline.py`
 
@@ -157,6 +159,8 @@ The pipeline for generating the time series plot consists of:
 3. Plotting the time series from `energy_output.csv`, which contains timestamps and values.
 
 Ensure that the files containing the simulation result are properly set in `pipeline.py`
+
+![Synthetic Energy data Image](reverie/energy/time_series_plot.png)
 
 ## ❤️ Acknowledgement
 I would like to thank following people for their support and supervisions in this project. 
