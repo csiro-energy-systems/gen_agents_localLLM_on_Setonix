@@ -26,7 +26,7 @@ key_owner = "" # keep this empty
 
 # huggingface key to load localLLM
 from huggingface_hub import login
-hf_hey = ""
+hf_hey = "" 
 login(hf_hey)
 
 embedding_checkpoint = "jinaai/jina-embeddings-v2-base-en"
@@ -55,8 +55,6 @@ if 'PYTORCH_CUDA_ALLOC_CONF' in os.environ:
 
 # mixtral
 checkpoint = "mistralai/Mistral-7B-Instruct-v0.1"  
-#checkpoint = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-#checkpoint = "meta-llama/Llama-2-13b-chat-hf"
 model = AutoModelForCausalLM.from_pretrained(checkpoint, trust_remote_code=True, torch_dtype=torch.bfloat16).to(device)#, device_map="auto") 
 
 
@@ -76,7 +74,10 @@ collision_block_id = "32125"
 # Verbose 
 debug = True
 ```
- 
+
+Please paste your huggingface token in `hf_hey`
+You can also change the embedding and LLM models by `embedding_checkpoint` and `checkpoint` respectively 
+
 ### Step 2. Install requirements.txt
 Install everything listed in the `requirements.txt` file (I strongly recommend first setting up a virtualenv as usual). A note on Python version: we tested our environment on Python 3.9.12. 
 
@@ -113,17 +114,7 @@ Your simulation should be running, and you will see the agents moving on the map
 
 The saved simulation can be accessed the next time you run the simulation server by providing the name of your simulation as the forked simulation. This will allow you to restart your simulation from the point where you left off.
 
-### Step 4. Replaying a Simulation
-You can replay a simulation that you have already run simply by having your environment server running and navigating to the following address in your browser: `http://localhost:8000/replay/<simulation-name>/<starting-time-step>`. Please make sure to replace `<simulation-name>` with the name of the simulation you want to replay, and `<starting-time-step>` with the integer time-step from which you wish to start the replay.
-
-For instance, by visiting the following link, you will initiate a pre-simulated example, starting at time-step 1:  
-[http://localhost:8000/replay/July1_the_ville_isabella_maria_klaus-step-3-20/1/](http://localhost:8000/replay/July1_the_ville_isabella_maria_klaus-step-3-20/1/)
-
-### Step 5. Demoing a Simulation
-You may have noticed that all character sprites in the replay look identical. We would like to clarify that the replay function is primarily intended for debugging purposes and does not prioritize optimizing the size of the simulation folder or the visuals. To properly demonstrate a simulation with appropriate character sprites, you will need to compress the simulation first. To do this, open the `compress_sim_storage.py` file located in the `reverie` directory using a text editor. Then, execute the `compress` function with the name of the target simulation as its input. By doing so, the simulation file will be compressed, making it ready for demonstration.
-
-To start the demo, go to the following address on your browser: `http://localhost:8000/demo/<simulation-name>/<starting-time-step>/<simulation-speed>`. Note that `<simulation-name>` and `<starting-time-step>` denote the same things as mentioned above. `<simulation-speed>` can be set to control the demo speed, where 1 is the slowest, and 5 is the fastest. For instance, visiting the following link will start a pre-simulated example, beginning at time-step 1, with a medium demo speed:  
-[http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/](http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/)
+#For Replaying and Demo of the simulation, please to refer to the Simulacra repo
 
 ### Tips
 - As mentioned in Simulacra, you will need a model equivalent to or stronger than ChatGPT3.5-Turbo for the agents to behave more like humans.
