@@ -1,0 +1,16 @@
+applience_usage_TrueFalse.txt
+
+Variables:
+!<INPUT 0>! -- descriptions of actions of people 
+!<INPUT 1>! -- appliance to check whether it is on use or not 
+
+---
+<commentblockmarker>###</commentblockmarker>
+Task: We want to understand the state and reason of an appliance based on the descriptions which contain person, action, location and object. 
+Descriptions: !<INPUT 0>!
+
+Output format: Output a json of the following format: 
+{
+"What is !<INPUT 1>!'s state?": "<json Boolean>",
+"What is the reason for the state of !<INPUT 1>!? Please be specific and think in step by step": "<Reason>"
+}

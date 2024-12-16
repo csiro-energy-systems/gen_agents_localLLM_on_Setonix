@@ -1,0 +1,103 @@
+applience_usage_TrueFalse.txt
+
+
+Variables:
+!<INPUT 0>! -- descriptions of actions of people 
+!<INPUT 1>! -- previous state of all appliances usage of the whole situation
+!<INPUT 2>! -- appliance to check whether it is on use or not 
+
+<commentblockmarker>###</commentblockmarker>
+Task: We want to understand the state of an appliance based on the descriptions of people which contain location, object, and action. 
+EXPLAIN YOUR REASONS AND ANSWER EITHER 'True' OR 'False' AT THE END
+
+----
+EXAMPLE 1
+
+We want to know about game console's state.
+
+Context:
+Klaus Mueller                                                      None
+Isabella Rodriguez    waking up and completing her morning routine (...
+Maria Lopez                                                        None
+Name: 2160, dtype: object
+{'refrigerator': False, 'toaster': False, 'cooking area': False, 'guitar': False, 'microphone': False, 'piano': False, 'game console': False, 'computer desk': False, 'computer': False}
+game console
+
+Factor 1: Based on {'refrigerator': False, 'toaster': False, 'cooking area': False, 'guitar': False, 'microphone': False, 'piano': False, 'game console': False, 'computer desk': False, 'computer': False}, Has game console been used in the previous state?
+
+Factor 2: Describe the game console's state using Klaus Mueller                                                      None
+Isabella Rodriguez    waking up and completing her morning routine (...
+Maria Lopez                                                        None
+Name: 2160, dtype: object. Has the Klaus Mueller                                                      None
+Isabella Rodriguez    waking up and completing her morning routine (...
+Maria Lopez                                                        None
+Name: 2160, dtype: object affected the state of game console?
+
+Factor 3: Based on Step 1 and Step 2, determine whether the game console is in use or not.
+
+EXPLAIN YOUR REASONS AND ANSWER EITHER 'True' OR 'False' AT THE END
+
+ANSWER:
+Factor 1: Based on the provided information, there is no indication that the game console has been used in the previous state. 
+
+Factor 2: The description of Isabella Rodriguez waking up and completing her morning routine does not provide any specific information about the game console's state or usage. The information about Klaus Mueller and Maria Lopez is not relevant to the current state of the game console.
+
+Factor 3: Combining Factor 1 and Factor 2, since there is no indication that the game console has been used in the previous state and no information about Isabella Rodriguez's routine affecting the game console's state, it can be inferred that the game console is not in use.
+
+Conclusion: False
+
+----
+EAMPLE 2
+
+We want to know about microphone's state.
+
+Context:
+Klaus Mueller         sleeping @ the Ville:Dorm for Oak Hill College...
+Isabella Rodriguez    sleeping @ the Ville:Isabella Rodriguez's apar...
+Maria Lopez           sleeping @ the Ville:Dorm for Oak Hill College...
+Name: 0, dtype: object
+{'refrigerator': False, 'toaster': False, 'cooking area': False, 'guitar': False, 'microphone': False, 'piano': False, 'game console': False, 'computer desk': False, 'computer': False}
+microphone
+
+Factor 1: Based on {'refrigerator': False, 'toaster': False, 'cooking area': False, 'guitar': False, 'microphone': False, 'piano': False, 'game console': False, 'computer desk': False, 'computer': False}, Has microphone been used in the previous state?
+
+Factor 2: Describe the microphone's state using Klaus Mueller         sleeping @ the Ville:Dorm for Oak Hill College...
+Isabella Rodriguez    sleeping @ the Ville:Isabella Rodriguez's apar...
+Maria Lopez           sleeping @ the Ville:Dorm for Oak Hill College...
+Name: 0, dtype: object. Has the Klaus Mueller         sleeping @ the Ville:Dorm for Oak Hill College...
+Isabella Rodriguez    sleeping @ the Ville:Isabella Rodriguez's apar...
+Maria Lopez           sleeping @ the Ville:Dorm for Oak Hill College...
+Name: 0, dtype: object affected the state of microphone?
+
+Factor 3: Based on Step 1 and Step 2, determine whether the microphone is in use or not.
+
+EXPLAIN YOUR REASONS AND ANSWER EITHER 'True' OR 'False' AT THE END
+
+ANSWER:
+Factor 1: Based on the provided information, there is no indication that the microphone has been used in the previous state.
+
+Factor 2: The description of Klaus Mueller, Isabella Rodriguez, and Maria Lopez sleeping at their respective locations does not provide any specific information about the microphone's state or usage. The information about their sleeping arrangements is not relevant to the current state of the microphone.
+
+Factor 3: Combining Factor 1 and Factor 2, since there is no indication that the microphone has been used in the previous state and no information about the sleeping arrangements affecting the microphone's state, it can be inferred that the microphone is not in use.
+
+Conclusion: False
+
+----
+YOUR PART 
+
+We want to know about !<INPUT 2>!'s state. 
+
+Context: 
+!<INPUT 0>! 
+!<INPUT 1>! 
+!<INPUT 2>! 
+
+Factor 1: Based on !<INPUT 1>!, Has !<INPUT 2>! been used in the previous state?
+
+Factor 2: Describe the !<INPUT 2>!'s state using !<INPUT 0>!. Has the !<INPUT 0>! affected the state of !<INPUT 2>!?
+
+Factor 3: Based on Step 1 and Step 2, determine whether the !<INPUT 2>! is in use or not. 
+
+EXPLAIN YOUR REASONS AND ANSWER EITHER 'True' OR 'False' AT THE END
+
+ANSWER:

@@ -1,0 +1,29 @@
+applience_usage_TrueFalse.txt
+
+
+Variables:
+!<INPUT 0>! -- descriptions of actions of people 
+!<INPUT 1>! -- previous state of all appliances usage of the whole situation
+!<INPUT 2>! -- appliance to check whether it is on use or not 
+
+<commentblockmarker>###</commentblockmarker>
+Task: We want to understand the state of an appliance based on the descriptions of people which contain location, object, and action. ONLY ANSWER IN EITHER 'True' OR 'False'
+
+---
+Let's think. 
+We want to know about !<INPUT 2>!'s state. 
+
+Context: 
+!<INPUT 0>! 
+!<INPUT 1>! 
+!<INPUT 2>! 
+
+Factor 1: Based on !<INPUT 1>!, Has !<INPUT 2>! been used in the previous state?
+
+Factor 2: Describe the !<INPUT 2>!'s state using !<INPUT 0>!. Has the !<INPUT 0>! affected the state of !<INPUT 2>!?
+
+Factor 3: Based on Step 1 and Step 2, determine whether the !<INPUT 2>! is in use or not. 
+
+ONLY ANSWER IN EITHER 'True' OR 'False'
+
+Answer:
