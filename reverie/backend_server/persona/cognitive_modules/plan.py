@@ -104,9 +104,20 @@ def generate_hourly_schedule(persona, wake_up_hour):
         if wake_up_hour > 0: 
           n_m1_activity += ["sleeping"]
           wake_up_hour -= 1
-        else: 
-          n_m1_activity += [run_gpt_prompt_generate_hourly_schedule(
-                          persona, curr_hour_str, n_m1_activity, hour_str)[0]]
+        else: #Phoebe modified the following line 
+          result = run_gpt_prompt_generate_hourly_schedule(
+              persona, curr_hour_str, n_m1_activity, hour_str)[0]
+
+          # Extract the first line of the result
+          first_line = result.strip().split("\n")[0] if result.strip() else ""
+
+          if first_line:  # Validate output
+              n_m1_activity.append(first_line)
+          else:
+              n_m1_activity.append("idle")  # Fallback activity
+
+          # n_m1_activity += [run_gpt_prompt_generate_hourly_schedule(
+          #                 persona, curr_hour_str, n_m1_activity, hour_str)[0]]
   
   # Step 1. Compressing the hourly schedule to the following format: 
   # The integer indicates the number of hours. They should add up to 24. 
@@ -116,6 +127,7 @@ def generate_hourly_schedule(persona, wake_up_hour):
   # ['having lunch', 1], ['working on her painting', 3], 
   # ['taking a break', 2], ['working on her painting', 2], 
   # ['relaxing and watching TV', 1], ['going to bed', 1], ['sleeping', 2]]
+  print ("DEBUG:::n_m1_activity ", n_m1_activity)
   _n_m1_hourly_compressed = []
   prev = None 
   prev_count = 0
@@ -127,12 +139,15 @@ def generate_hourly_schedule(persona, wake_up_hour):
     else: 
       if _n_m1_hourly_compressed: 
         _n_m1_hourly_compressed[-1][1] += 1
+  print ("DEBUG:::_n_m1_hourly_compressed ", _n_m1_hourly_compressed)
 
   # Step 2. Expand to min scale (from hour scale)
   # [['sleeping', 360], ['waking up and starting her morning routine', 60], 
   # ['eating breakfast', 60],..
   n_m1_hourly_compressed = []
   for task, duration in _n_m1_hourly_compressed: 
+    print ("DEBUG:::task in _n_m1_hourly_compressed ", task)
+    print ("DEBUG:::task, duration in _n_m1_hourly_compressed ",  duration)
     n_m1_hourly_compressed += [[task, duration*60]]
 
   return n_m1_hourly_compressed
@@ -260,8 +275,18 @@ def generate_action_event_triple(act_desp, persona):
   EXAMPLE OUTPUT: 
     "🧈🍞"
   """
-  if debug: print ("GNS FUNCTION: <generate_action_event_triple>")
-  return run_gpt_prompt_event_triple(act_desp, persona)[0]
+  if debug:
+    print ("GNS FUNCTION: <generate_action_event_triple>  for plan.py")
+    print("debug: ~~~ prompt_input ~~~")
+    print ("act_desp: ", act_desp)
+    print ("persona: ", persona)
+    print("debug: ~~~ end of prompt_input ~~~")
+  result = run_gpt_prompt_event_triple(act_desp, persona)
+  if debug: 
+    print ("debug: RESULT ~~", result)
+    print("debug: ~~~ end of result ~~~")
+  return result[0]
+  # return run_gpt_prompt_event_triple(act_desp, persona)[0]
 
 
 def generate_act_obj_desc(act_game_object, act_desp, persona): 
@@ -487,12 +512,18 @@ def _long_term_planning(persona, new_day):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TODO
     # We need to create a new daily_req here...
     persona.scratch.daily_req = persona.scratch.daily_req
+  print ("DEBUG::: loaded new_day ",  persona.scratch.daily_req)
+  print ("DEBUG::: loadied  new_day, persona.scratch.daily_req",  persona.scratch.daily_req)
 
   # Based on the daily_req, we create an hourly schedule for the persona, 
   # which is a list of todo items with a time duration (in minutes) that 
   # add up to 24 hours.
   persona.scratch.f_daily_schedule = generate_hourly_schedule(persona, 
                                                               wake_up_hour)
+  print ("DEBUG::: loaded  persona.scratch.f_daily_schedule--------- " )
+  print (persona.scratch.f_daily_schedule)
+  print("DEBUG::: end  persona.scratch.f_daily_schedule--------- " )
+  print ("DEBUG:::   EXAMPLE OUTPUT: [['sleeping', 360], ['waking up and starting her morning routine', 60], ['eating breakfast', 60],..e--------- " )
   persona.scratch.f_daily_schedule_hourly_org = (persona.scratch
                                                    .f_daily_schedule[:])
 
@@ -595,7 +626,7 @@ def _determine_action(persona, maze):
   # Generate an <Action> instance from the action description and duration. By
   # this point, we assume that all the relevant actions are decomposed and 
   # ready in f_daily_schedule. 
-  print ("DEBUG LJSDLFSKJF")
+  print ("DEBUG def _determine_action(persona, maze)~~~~~~~~")
   for i in persona.scratch.f_daily_schedule: print (i)
   print (curr_index)
   print (len(persona.scratch.f_daily_schedule))

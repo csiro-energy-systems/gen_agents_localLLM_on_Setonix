@@ -264,10 +264,18 @@ def run_gpt_prompt_generate_hourly_schedule(persona,
   #   return output, [output, prompt, gpt_param, prompt_input, fail_safe]
   # # ChatGPT Plugin ===========================================================
 
-
-  gpt_param = {"engine": "text-davinci-003", "max_tokens": 50, 
+  print ("debug::: input for run_gpt_prompt_generate_hourly_schedule") ########
+  print("curr_hour_str", curr_hour_str) ########
+  print("p_f_ds_hourly_org", p_f_ds_hourly_org) ########
+  print("hour_str", hour_str) ########
+  print("intermission2", intermission2) ########
+  print("test_input", test_input) ########
+  gpt_param = {"engine": "text-davinci-003", "max_tokens": 20, ## modified by Phoebe
+               #"engine": "text-davinci-003", "max_tokens": 50, 
                "temperature": 0.5, "top_p": 1, "stream": False,
-               "frequency_penalty": 0, "presence_penalty": 0, "stop": ["\n"]}
+               "frequency_penalty": 0, "presence_penalty": 0, 
+               "stop": ["\n"]
+               }
   prompt_template = "persona/prompt_template/v2/generate_hourly_schedule_v2.txt"
   prompt_input = create_prompt_input(persona, 
                                      curr_hour_str, 
@@ -275,16 +283,26 @@ def run_gpt_prompt_generate_hourly_schedule(persona,
                                      hour_str, 
                                      intermission2,
                                      test_input)
+  print ("debug::: prompt_input for generate_prompt") ########
+  print (prompt_input) ########
+  print ("debug::: end of prompt_input") ########
   prompt = generate_prompt(prompt_input, prompt_template)
   fail_safe = get_fail_safe()
   
   output = safe_generate_response(prompt, gpt_param, 5, fail_safe,
                                    __func_validate, __func_clean_up)
-  
+  print ("debug::: output for run_gpt_prompt_generate_hourly_schedule", output) ########
+
+  # Extract the first line of the output
+  output = output.strip().split("\n")[0] if output.strip() else ""
+  print ("debug::: strip the first line~~~~~~~~~~~", output) ########
+
   if debug or verbose: 
     print_run_prompts(prompt_template, persona, gpt_param, 
                       prompt_input, prompt, output)
     
+  print ("debug::: end for run_gpt_prompt_generate_hourly_schedule~~~~~~~~~") 
+  print ("------------------------------------------------------")########
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]
 
 
@@ -447,7 +465,7 @@ def run_gpt_prompt_task_decomp(persona,
   prompt = generate_prompt(prompt_input, prompt_template)
   fail_safe = get_fail_safe()
 
-  print ("?????")
+  print ("?????3244534", file=sys.stderr )
   print (prompt)
   output = safe_generate_response(prompt, gpt_param, 3, get_fail_safe(),
                                    __func_validate, __func_clean_up)
@@ -809,6 +827,7 @@ def run_gpt_prompt_action_game_object(action_description,
 
 
 def run_gpt_prompt_pronunciatio(action_description, persona, verbose=False): 
+  print ("debug - running def run_gpt_prompt_pronunciatio()") ########
   def create_prompt_input(action_description): 
     if "(" in action_description: 
       action_description = action_description.split("(")[-1].split(")")[0]
@@ -851,29 +870,36 @@ def run_gpt_prompt_pronunciatio(action_description, persona, verbose=False):
     return True
 
   print ("asdhfapsh8p9hfaiafdsi;ldfj as DEBUG 4") ########
-  gpt_param = {"engine": "text-davinci-002", "max_tokens": 15, 
-               "temperature": 0, "top_p": 1, "stream": False,
-               "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
-  prompt_template = "persona/prompt_template/v3_ChatGPT/generate_pronunciatio_v1.txt" ########
-  prompt_input = create_prompt_input(action_description)  ########
-  prompt = generate_prompt(prompt_input, prompt_template)
-  example_output = "🛁🧖‍♀️" ########
-  special_instruction = "The value for the output must ONLY contain the emojis." ########
-  
-  ## added by Yusuke 22/12/2023
-  prompt = '"""\n' + prompt + '\n"""\n'
-  prompt += f"Output the response to the prompt above in json. {special_instruction}\n"
-  prompt += "Example output json:\n"
-  prompt += '{"output": "' + str(example_output) + '"}'
-  
-  fail_safe = get_fail_safe()
-  #output = ChatGPT_safe_generate_response(prompt, example_output, special_instruction, 3, fail_safe,
-  #                                        __chat_func_validate, __chat_func_clean_up, True)
+  try:
+    gpt_param = {"engine": "text-davinci-002", "max_tokens": 15, 
+                "temperature": 0, "top_p": 1, "stream": False,
+                "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
+    prompt_template = "persona/prompt_template/v3_ChatGPT/generate_pronunciatio_v1.txt" ########
+    prompt_input = create_prompt_input(action_description)  ########
+    print ("debug - prompt_input", prompt_input) ########
+    prompt = generate_prompt(prompt_input, prompt_template)
+    example_output = "🛁🧖‍♀️" ########
+    print ("debug - prompt", prompt) ########
+    print ("debug - example_output", example_output) ########
+    special_instruction = "The value for the output must ONLY contain the emojis." ########
+    
+    ## added by Yusuke 22/12/2023
+    prompt = '"""\n' + prompt + '\n"""\n'
+    prompt += f"Output the response to the prompt above in json. {special_instruction}\n"
+    prompt += "Example output json:\n"
+    prompt += '{"output": "' + str(example_output) + '"}'
+    
+    fail_safe = get_fail_safe()
+    #output = ChatGPT_safe_generate_response(prompt, example_output, special_instruction, 3, fail_safe,
+    #                                        __chat_func_validate, __chat_func_clean_up, True)
 
-  output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
-                                   __func_validate, __func_clean_up)
-  if output != False: 
-    return output, [output, prompt, gpt_param, prompt_input, fail_safe]
+    output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
+                                    __func_validate, __func_clean_up)
+    print ("debug - output for def run_gpt_prompt_pronunciatio", output) ########
+    if output != False: 
+      return output, [output, prompt, gpt_param, prompt_input, fail_safe]
+  except Exception as e:
+    print ("debug - error in def run_gpt_prompt_pronunciatio", e)
   # ChatGPT Plugin ===========================================================
 
 
@@ -979,6 +1005,7 @@ def run_gpt_prompt_event_triple(action_description, persona, verbose=False):
   output = safe_generate_response(prompt, gpt_param, 5, fail_safe,
                                    __func_validate, __func_clean_up)
   output = (persona.name, output[0], output[1])
+  print("DEBUG output, [output, prompt, gpt_param, prompt_input, fail_safe]", output, [output, prompt, gpt_param, prompt_input, fail_safe])
 
   if debug or verbose: 
     print_run_prompts(prompt_template, persona, gpt_param, 
@@ -1037,29 +1064,32 @@ def run_gpt_prompt_act_obj_desc(act_game_object, act_desp, persona, verbose=Fals
     return True 
 
   print ("asdhfapsh8p9hfaiafdsi;ldfj as DEBUG 6") ########
-  gpt_param = {"engine": "text-davinci-002", "max_tokens": 50, 
-               "temperature": 0, "top_p": 1, "stream": False,
-               "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
-  prompt_template = "persona/prompt_template/v3_ChatGPT/generate_obj_event_v1.txt" ########
-  prompt_input = create_prompt_input(act_game_object, act_desp, persona)  ########
-  prompt = generate_prompt(prompt_input, prompt_template)
-  example_output = "being fixed" ########
-  special_instruction = "The output should ONLY contain the phrase that should go in <fill in>." ########
-  
-  ## added by Yusuke 22/12/2023
-  prompt = '"""\n' + prompt + '\n"""\n'
-  prompt += f"Output the response to the prompt above in json. {special_instruction}\n"
-  prompt += "Example output json:\n"
-  prompt += '{"output": "' + str(example_output) + '"}'
-  
-  fail_safe = get_fail_safe(act_game_object) ########
-  #output = ChatGPT_safe_generate_response(prompt, example_output, special_instruction, 3, fail_safe,
-  #                                        __chat_func_validate, __chat_func_clean_up, True)
-  output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
-                                   __func_validate, __func_clean_up)
-  
-  if output != False: 
-    return output, [output, prompt, gpt_param, prompt_input, fail_safe]
+  try: 
+    gpt_param = {"engine": "text-davinci-002", "max_tokens": 50, 
+                "temperature": 0, "top_p": 1, "stream": False,
+                "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
+    prompt_template = "persona/prompt_template/v3_ChatGPT/generate_obj_event_v1.txt" ########
+    prompt_input = create_prompt_input(act_game_object, act_desp, persona)  ########
+    prompt = generate_prompt(prompt_input, prompt_template)
+    example_output = "being fixed" ########
+    special_instruction = "The output should ONLY contain the phrase that should go in <fill in>." ########
+    
+    ## added by Yusuke 22/12/2023
+    prompt = '"""\n' + prompt + '\n"""\n'
+    prompt += f"Output the response to the prompt above in json. {special_instruction}\n"
+    prompt += "Example output json:\n"
+    prompt += '{"output": "' + str(example_output) + '"}'
+    
+    fail_safe = get_fail_safe(act_game_object) ########
+    #output = ChatGPT_safe_generate_response(prompt, example_output, special_instruction, 3, fail_safe,
+    #                                        __chat_func_validate, __chat_func_clean_up, True)
+    output = safe_generate_response(prompt, gpt_param, 3, fail_safe,
+                                    __func_validate, __func_clean_up)
+    
+    if output != False: 
+      return output, [output, prompt, gpt_param, prompt_input, fail_safe]
+  except Exception as e:
+    print ("debug - error in def run_gpt_prompt_act_obj_desc", e)
   # ChatGPT Plugin ===========================================================
 
 

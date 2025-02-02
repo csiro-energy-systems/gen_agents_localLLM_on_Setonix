@@ -303,19 +303,29 @@ def local_LLM(prompt, model_param=None):
     temperature = 0.5
     do_sample=True
   
-  #try: 
-    
-  # process input
-  inputs = tokenizer(prompt, return_tensors="pt").to(device) # Tokenize
-  start_index = inputs["input_ids"].shape[-1]
-  outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, temperature=temperature) # Generate output  
-  generation_output = outputs[0][start_index:]
+  try: 
+      # debug by phoebe: Count the number of tokens in the prompt
+    token_count = len(tokenizer.encode(prompt))
+    print(f"Token count for prompt: {token_count}")  # Debugging or logging  
 
-  return tokenizer.decode(generation_output, skip_special_tokens=True)
+    # process input
+    inputs = tokenizer(prompt, return_tensors="pt").to(device) # Tokenize
+    start_index = inputs["input_ids"].shape[-1]
+    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, temperature=temperature) # Generate output  
+    generation_output = outputs[0][start_index:]
+    import torch
+
+    ## added by Phoebe 1/2025
+    print(f"Allocated memory: {torch.cuda.memory_allocated(0) / 1024**2:.2f} MB")
+    print(f"Cached memory: {torch.cuda.memory_reserved(0) / 1024**2:.2f} MB")
+    torch.cuda.empty_cache() 
+
+
+    return tokenizer.decode(generation_output, skip_special_tokens=True)
   
-  #except: 
-  #  print ("Local LLM ERROR")
-  #  return "Local LLM ERROR"
+  except: 
+    print ("Local LLM ERROR")
+    return "Local LLM ERROR"
 
 
 def generate_prompt(curr_input, prompt_lib_file): 

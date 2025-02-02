@@ -180,6 +180,26 @@ def find_filenames(path_to_dir, suffix=".csv"):
   RETURNS: 
     A list of paths to all files in the directory. 
   """
+  #get current folder position
+  try:
+      # Get the current working directory
+      cwd = os.getcwd()
+      # Print the current working directory
+      print("DEBUG: Current Working Directory:", cwd)
+      base_dir = "/scratch/interns202410/phoebedang/updated_gen_LLM/environment/frontend_server"
+      print("DEBUG: parth_to_dir before: ", path_to_dir)
+      path_to_dir = os.path.join(base_dir, path_to_dir)
+      print("DEBUG: parth_to_dir after: ", path_to_dir)
+  except Exception as e:
+      # Handle any errors (e.g., if the current directory is inaccessible)
+      print(f"Error occurred while getting the current working directory: {e}")
+
+   # Check if the constructed path exists
+  if os.path.exists(path_to_dir):
+      print("DEBUG: Path exists:", path_to_dir)
+  else:
+      print("ERROR: Path does not exist:", path_to_dir)
+
   filenames = listdir(path_to_dir)
   return [ path_to_dir+"/"+filename 
            for filename in filenames if filename.endswith( suffix ) ]

@@ -215,6 +215,7 @@ class Persona:
           != curr_time.strftime('%A %B %d')):
       new_day = "New day"
     self.scratch.curr_time = curr_time
+    print(f"debug - starting New day in def moce(): {new_day}")
 
     # Main cognitive sequence begins here. 
     perceived = self.perceive(maze)

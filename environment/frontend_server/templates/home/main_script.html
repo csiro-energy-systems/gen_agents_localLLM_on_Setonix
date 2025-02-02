@@ -405,21 +405,52 @@
 	    // Note that we do not want to overburden the backend too much by 
 	    // over-querying; so, we have a timer set so we only query it once every
 	    // timer_max cycles. 
+		// Debug BY phoebe: Log current phase and timer value
+		console.log("Phase: update, Timer:", timer);
 	    if (timer <= 0) {
 	      var update_xobj = new XMLHttpRequest();
 	      update_xobj.overrideMimeType("application/json");
+
+			// Debug: Log API request details
+			console.log("Sending POST request to update_environment with:", {
+			step: step,
+			sim_code: sim_code
+			});	
+
 	      update_xobj.open('POST', "{% url 'update_environment' %}", true);
 	      update_xobj.addEventListener("load", function() {
 	        if (this.readyState === 4) {
 	          if (update_xobj.status === 200) {
-	            if (JSON.parse(update_xobj.responseText)["<step>"] == step) {
-	              execute_movement = JSON.parse(update_xobj.responseText)
-	              phase = "execute";
-	            }
-	            timer = timer_max;
-	          }
-	        }
-	      });
+				// added by Phoebe 1/2025
+				try {
+                    let response = JSON.parse(update_xobj.responseText);
+
+                    // Debug: Log server response status
+            		console.log("Response received. Status:", update_xobj.status);
+
+                    if (response["<step>"] == step) {
+                        execute_movement = response;
+                        phase = "execute";
+                    }
+					console.log("Phase changed to: execute");
+                    timer = timer_max;
+                } catch (error) {
+                    console.error("Error parsing JSON response:", error);
+                    console.error("Response received:", update_xobj.responseText);
+                }
+            } else {
+                console.error("HTTP Error:", update_xobj.status, update_xobj.statusText);
+            }
+        }
+    });
+	    //         if (JSON.parse(update_xobj.responseText)["<step>"] == step) {
+	    //           execute_movement = JSON.parse(update_xobj.responseText)
+	    //           phase = "execute";
+	    //         }
+	    //         timer = timer_max;
+	    //       }
+	    //     }
+	    //   });
 	      update_xobj.send(JSON.stringify({"step": step, "sim_code": sim_code }));   
 	    }
 	    timer = timer - 1; 
@@ -431,6 +462,34 @@
 	    // (or some personas might not move if they choose not to). 
 	    // The execute_count_max is computed by tile_width/movement_speed, which
 	    // defines a one step sequence in this world. 
+
+		// Debug by Phoebe: Log current phase and execute_movement
+		console.log("Phase: execute, updating game-time-content");
+		console.log("execute_movement:", execute_movement);
+		console.log("meta:", execute_movement?.meta);
+		console.log("curr_time:", execute_movement?.meta?.curr_time);
+		// Ensure 'execute_movement' is defined before accessing properties
+		if (!execute_movement) {
+        console.error("Error: execute_movement is undefined!");
+		} else if (!execute_movement.meta) {
+			console.error("Error: execute_movement.meta is undefined!", execute_movement);
+		} else if (execute_movement.meta.curr_time === undefined) {
+			console.warn("Warning: curr_time is missing in execute_movement.meta", execute_movement.meta);
+		} else {
+			// Ensure the element exists before modifying innerHTML
+			let gameTimeContent = document.getElementById("game-time-content");
+
+			if (!gameTimeContent) {
+				console.error("Error: Element with ID 'game-time-content' not found!");
+			} else {
+				gameTimeContent.innerHTML = execute_movement.meta.curr_time;
+				console.log("Updated game-time-content to:", execute_movement.meta.curr_time);
+			}
+		}
+
+		console.log(JSON.stringify(execute_movement, null, 2));
+		// END Debug by Phoebe
+		
 	    document.getElementById("game-time-content").innerHTML = execute_movement["meta"]["curr_time"];
 	    for (let i=0; i<Object.keys(personas).length; i++) {
 	      let curr_persona_name = Object.keys(personas)[i];

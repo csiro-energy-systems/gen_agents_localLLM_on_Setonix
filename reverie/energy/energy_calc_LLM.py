@@ -177,13 +177,14 @@ def calculate_energy(master_movement_file, objects_file=''):
             # Check once in a while and write the output to a CSV file
             if int(step) % 100 == 0:
                 print('debug, saving to output file')
-                output_file = "energy_output_LLM.csv"
+                output_file = "energy_output_LLM_testv2.csv"
                 pd.DataFrame(output_data).to_csv(output_file, index=False)
                 print(f"Energy calculation results written to {output_file}")
 
 
 # Example usage
-calculate_energy("../../environment/frontend_server/compressed_storage/July1_the_ville_isabella_maria_klaus-step-3-20/master_movement.json")
+calculate_energy("../../environment/frontend_server/compressed_storage/test-simulation-24hour/master_movement.json")
+print("Energy calculation completed successfully for llm")
 
 
 #TODO use this to text skip same descriptions

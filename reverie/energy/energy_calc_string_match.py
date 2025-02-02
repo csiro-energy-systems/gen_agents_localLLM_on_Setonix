@@ -80,7 +80,7 @@ def calculate_energy(master_movement_file, objects_file):
                 })          
 
     # Write the output to a CSV file using pandas
-    output_file = "energy_output.csv"
+    output_file = "energy_output_string_matching.csv"
     pd.DataFrame(output_data).to_csv(output_file, index=False)
     print(f"Energy calculation results written to {output_file}")
 
@@ -91,5 +91,6 @@ def calculate_energy(master_movement_file, objects_file):
 # TODO main
 if __name__ == "__main__":
     # Example usage
-    calculate_energy("../../environment/frontend_server/compressed_storage/July1_the_ville_isabella_maria_klaus-step-3-20/master_movement.json", "../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv")
-
+    calculate_energy("../../environment/frontend_server/compressed_storage/test-simulation-24hour/master_movement.json",
+                      "../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv")
+    print("Energy calculation completed successfully for string matching")

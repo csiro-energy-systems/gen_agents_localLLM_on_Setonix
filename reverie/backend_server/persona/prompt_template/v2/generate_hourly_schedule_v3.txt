@@ -1,4 +1,4 @@
-generate_hourly_schedule_v2.txt
+generate_hourly_schedule_v3.txt
 
 Variables: 
 !<INPUT 0>! -- Schedule format
@@ -20,5 +20,11 @@ prior_schedule:
 !<INPUT 3>!
 
 !<INPUT 4>!
-
+Fill in the activity for: 
 !<INPUT 5>!
+The output must be one line only and similiar to this: 
+waking up and starting her morning routine
+having breakfast
+painting 
+exercising
+etc

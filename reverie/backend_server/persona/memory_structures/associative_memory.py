@@ -12,6 +12,7 @@ sys.path.append('../../')
 
 import json
 import datetime
+import numpy as np
 
 from global_methods import *
 
@@ -147,7 +148,11 @@ class AssociativeMemory:
       json.dump(r, outfile)
 
     with open(out_json+"/embeddings.json", "w") as outfile:
-      json.dump(self.embeddings, outfile)
+      # json.dump(self.embeddings, outfile)
+      ## added by Phoebe 1/2025
+      json.dump({key: value.tolist() if isinstance(value, np.ndarray) else value
+            for key, value in self.embeddings.items()},outfile , indent=4)
+
 
 
   def add_event(self, created, expiration, s, p, o, 

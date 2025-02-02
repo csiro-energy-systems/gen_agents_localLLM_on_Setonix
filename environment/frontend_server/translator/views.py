@@ -11,7 +11,7 @@ import os
 
 import datetime
 from django.shortcuts import render, redirect, HttpResponseRedirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from global_methods import *
 
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -103,11 +103,36 @@ def UIST_Demo(request):
 
 
 def home(request):
+  
   f_curr_sim_code = "temp_storage/curr_sim_code.json"
   f_curr_step = "temp_storage/curr_step.json"
+  cwd = os.getcwd()
+  print("DEBUG: Current Working Directory:", cwd)
+  # print("home", f_curr_sim_code,f_curr_step)
+  # Define the base directory
+  base_dir = "/scratch/interns202410/phoebedang/updated_gen_LLM/environment/frontend_server"
+  
+  # Construct the full path
+  f_curr_sim_code = os.path.join(base_dir, f_curr_sim_code)
+  # print("DEBUG: parth_to_dir after:", f_curr_sim_code)
+  f_curr_step = os.path.join(base_dir, f_curr_step)
+  # print("DEBUG: parth_to_dir after:", f_curr_step)
+
+  if os.path.exists(f_curr_sim_code):
+      print("DEBUG: Path exists:", f_curr_sim_code)
+  else:
+      print("ERROR: Path does not exist:", f_curr_sim_code)
+  
+  # Check if the constructed path exists
+  if os.path.exists(f_curr_step):
+      print("DEBUG: Path exists:", f_curr_step)
+  else:
+      print("ERROR: Path does not exist:", f_curr_step)
+    
 
   if not check_if_file_exists(f_curr_step): 
     context = {}
+    print("DEBUG: error_start_backend")
     template = "home/error_start_backend.html"
     return render(request, template, context)
 
@@ -118,6 +143,7 @@ def home(request):
     step = json.load(json_file)["step"]
 
   os.remove(f_curr_step)
+  print("removed f_curr_step",f_curr_step) ## added by Phoebe 1/2025
 
   persona_names = []
   persona_names_set = set()
@@ -134,6 +160,12 @@ def home(request):
     if x[0] != ".": 
       file_count += [int(x.split(".")[0])]
   curr_json = f'storage/{sim_code}/environment/{str(max(file_count))}.json'
+  
+  # Define the base directory ## added by Phoebe 1/2025
+  base_dir = "/scratch/interns202410/phoebedang/updated_gen_LLM/environment/frontend_server"
+  curr_json = os.path.join(base_dir, curr_json)
+  print("DEBUG: curr_json after:", curr_json)
+   
   with open(curr_json) as json_file:  
     persona_init_pos_dict = json.load(json_file)
     for key, val in persona_init_pos_dict.items(): 
@@ -168,6 +200,26 @@ def replay(request, sim_code, step):
     if x[0] != ".": 
       file_count += [int(x.split(".")[0])]
   curr_json = f'storage/{sim_code}/environment/{str(max(file_count))}.json'
+
+  # Get the current working directory
+  cwd = os.getcwd()
+  print("DEBUG: Current Working Directory:", cwd)
+  
+  # Define the base directory
+  base_dir = "/scratch/interns202410/phoebedang/updated_gen_LLM/environment/frontend_server"
+  
+  print("DEBUG: curr_json before:", curr_json)
+  
+  # Construct the full path
+  curr_json = os.path.join(base_dir, curr_json)
+  print("DEBUG: curr_json after:", curr_json)
+  
+  # Check if the constructed path exists
+  if os.path.exists(curr_json):
+      print("DEBUG: Path exists:", curr_json)
+  else:
+      print("ERROR: Path does not exist:", curr_json)
+
   with open(curr_json) as json_file:  
     persona_init_pos_dict = json.load(json_file)
     for key, val in persona_init_pos_dict.items(): 
@@ -259,8 +311,34 @@ def process_environment(request):
   sim_code = data["sim_code"]
   environment = data["environment"]
 
-  with open(f"storage/{sim_code}/environment/{step}.json", "w") as outfile:
+    ## added by Phoebe 1/2025
+  print("data = json.loads(request.body): ", data)
+  print("step: ", step, "sim_code: ", sim_code, "environment: ", environment)
+  print("DEBUG: process_environment at front end Open folder: ", f"storage/{sim_code}/environment/{step}.json")
+  # Get the current working directory
+  cwd = os.getcwd()
+  print("DEBUG: Current Working Directory:", cwd)
+
+  # Define the base directory
+  base_dir = "/scratch/interns202410/phoebedang/updated_gen_LLM/environment/frontend_server"
+  curr_json = f'storage/{sim_code}/environment/{step}.json'
+  
+  
+  print("DEBUG: curr_json before:", curr_json)
+  
+  # Construct the full path
+  curr_json = os.path.join(base_dir, curr_json)
+  print("DEBUG: curr_json after:", curr_json)
+  
+  # Check if the constructed path exists
+  if os.path.exists(curr_json):
+      print("DEBUG: Path exists:", curr_json)
+  else:
+      print("ERROR: Path does not exist:", curr_json)
+  
+  with open(curr_json, "w") as outfile:
     outfile.write(json.dumps(environment, indent=2))
+    print("wrote to curr_json", environment)
 
   return HttpResponse("received")
 
@@ -291,6 +369,46 @@ def update_environment(request):
     with open(f"storage/{sim_code}/movement/{step}.json") as json_file: 
       response_data = json.load(json_file)
       response_data["<step>"] = step
+
+  ## added by Phoebe 1/2025
+  # print("data = json.loads(request.body): ", data)
+  # print("step: ", step, "sim_code: ", sim_code)
+  # print("DEBUG: update_environment at front end Open folder: ", f"storage/{sim_code}/environment/{step}.json")
+  #   # Get the current working directory
+  # cwd = os.getcwd()
+  # print("DEBUG: Current Working Directory:", cwd)
+
+  #  # Define the base directory
+  # base_dir = "/scratch/interns202410/phoebedang/updated_gen_LLM/environment/frontend_server"
+  # curr_json = f'storage/{sim_code}/environment/{step}.json'
+  
+  # # print("DEBUG: curr_json before:", curr_json)
+  
+  # # Construct the full path
+  # curr_json = os.path.join(base_dir, curr_json)
+  # # print("DEBUG: curr_json after:", curr_json)
+  
+  # # Check if the constructed path exists
+  # if os.path.exists(curr_json):
+  #     print("DEBUG: Path exists:", curr_json)
+  # else:
+  #     print("ERROR: Path does not exist:", curr_json)
+
+  # response_data = {"<step>": -1}
+
+  # # if (check_if_file_exists(f"storage/{sim_code}/movement/{step}.json")):
+  # #   with open(f"storage/{sim_code}/movement/{step}.json") as json_file: 
+  # try:
+  #   if (check_if_file_exists(curr_json)):
+  #     with open(curr_json) as json_file: 
+  #       response_data = json.load(json_file)
+  #       print("DEBUG: response_data", response_data )
+  #       response_data["<step>"] = step
+  #       print("DEBUG: return response_data", response_data ,"with new step", step)
+  # except Exception as e: 
+  #   print("ERROR: ", e)
+  #   print("ERROR: Could not read the file", curr_json)
+  #   print("ERROR: response_data", response_data)
 
   return JsonResponse(response_data)
 
