@@ -279,7 +279,7 @@ def generate_action_event_triple(act_desp, persona):
     print ("GNS FUNCTION: <generate_action_event_triple>  for plan.py")
     print("debug: ~~~ prompt_input ~~~")
     print ("act_desp: ", act_desp)
-    print ("persona: ", persona)
+    # print ("persona: ", persona)
     print("debug: ~~~ end of prompt_input ~~~")
   result = run_gpt_prompt_event_triple(act_desp, persona)
   if debug: 

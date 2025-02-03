@@ -30,7 +30,7 @@ def load_appliances(objects_file):
 
     return initial_state
 
-def calculate_energy(master_movement_file, objects_file):
+def calculate_energy(master_movement_file, objects_file, output_file):
     # Get the initial state from the objects file
     initial_state = load_appliances(objects_file)
 
@@ -80,7 +80,7 @@ def calculate_energy(master_movement_file, objects_file):
                 })          
 
     # Write the output to a CSV file using pandas
-    output_file = "energy_output_string_matching.csv"
+    
     pd.DataFrame(output_data).to_csv(output_file, index=False)
     print(f"Energy calculation results written to {output_file}")
 
@@ -91,6 +91,14 @@ def calculate_energy(master_movement_file, objects_file):
 # TODO main
 if __name__ == "__main__":
     # Example usage
-    calculate_energy("../../environment/frontend_server/compressed_storage/test-simulation-24hour/master_movement.json",
-                      "../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv")
-    print("Energy calculation completed successfully for string matching")
+    simulation_names = [
+                      "simulation_base_the_ville_n25_24h_10s_run1_14h",
+                      "simulation_base_the_ville_n25_24h_10s_run2_11h",
+                      "simulation_base_the_ville_n25_24h_10s_run3_10h", "simulation_base_the_ville_n25_24h_30s_run1_15h"]
+    for simulation_name in simulation_names:
+        calculate_energy(f"../../environment/frontend_server/compressed_storage/{simulation_name}/master_movement.json",
+                          "../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv",
+                          f"energy_output_sm_{simulation_name}.csv")
+        print(f"Energy calculation completed successfully for {simulation_name}")
+
+    print("Energy calculation completed successfully for all simulations using string matching")
