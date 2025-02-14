@@ -264,12 +264,12 @@ def run_gpt_prompt_generate_hourly_schedule(persona,
   #   return output, [output, prompt, gpt_param, prompt_input, fail_safe]
   # # ChatGPT Plugin ===========================================================
 
-  print ("debug::: input for run_gpt_prompt_generate_hourly_schedule") ########
-  print("curr_hour_str", curr_hour_str) ########
-  print("p_f_ds_hourly_org", p_f_ds_hourly_org) ########
-  print("hour_str", hour_str) ########
-  print("intermission2", intermission2) ########
-  print("test_input", test_input) ########
+  # print ("debug::: input for run_gpt_prompt_generate_hourly_schedule") ########
+  # print("curr_hour_str", curr_hour_str) ########
+  # print("p_f_ds_hourly_org", p_f_ds_hourly_org) ########
+  # print("hour_str", hour_str) ########
+  # print("intermission2", intermission2) ########
+  # print("test_input", test_input) ########
   gpt_param = {"engine": "text-davinci-003", "max_tokens": 20, ## modified by Phoebe
                #"engine": "text-davinci-003", "max_tokens": 50, 
                "temperature": 0.5, "top_p": 1, "stream": False,

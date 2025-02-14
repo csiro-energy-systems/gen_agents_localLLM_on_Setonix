@@ -4,6 +4,7 @@ static_dirs/*
 
 !storage/base_the_ville_isabella_maria_klaus/*
 !storage/base_the_ville_n25/*
+!storage/base_the_ville_n25_30s/*
 
 bin/
 include/
@@ -104,3 +105,4 @@ ENV/
 environment/frontend_server/storage
 environment/frontend_server/temp_storage
 environment/frontend_server/compressed_storage
+slurm-*

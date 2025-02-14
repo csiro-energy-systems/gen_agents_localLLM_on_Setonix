@@ -55,8 +55,8 @@ def calculate_energy(master_movement_file, objects_file, output_file):
         # Sometimes step_data is {} and does not contain anything. Should I keep it as current_state?
         #print(step)
 
-        # Calculate the adjusted timestamp based on 12am start and 10-second steps
-        adjusted_timestamp = (current_time + timedelta(seconds=int(step) * 10)).strftime('%H:%M:%S')
+        # Calculate the adjusted timestamp based on 12am start and 60-second steps
+        adjusted_timestamp = (current_time + timedelta(seconds=int(step) * 30)).strftime('%H:%M:%S')
 
         for person, actions in step_data.items():
             description = actions['description']
@@ -81,8 +81,8 @@ def calculate_energy(master_movement_file, objects_file, output_file):
 
     # Write the output to a CSV file using pandas
     
-    pd.DataFrame(output_data).to_csv(output_file, index=False)
-    print(f"Energy calculation results written to {output_file}")
+    pd.DataFrame(output_data).to_csv(f"energy_output_{output_file}.csv", index=False)
+    print(f"Energy calculation results written to energy_output_{output_file}.csv")
 
     #return output_data
     return output_data
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     for simulation_name in simulation_names:
         calculate_energy(f"../../environment/frontend_server/compressed_storage/{simulation_name}/master_movement.json",
                           "../../environment/frontend_server/static_dirs/assets/the_ville/matrix/special_blocks/game_object_blocks_copy.csv",
-                          f"energy_output_sm_{simulation_name}.csv")
+                          simulation_names)
         print(f"Energy calculation completed successfully for {simulation_name}")
 
     print("Energy calculation completed successfully for all simulations using string matching")

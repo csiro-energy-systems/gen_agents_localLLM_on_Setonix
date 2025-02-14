@@ -13,6 +13,7 @@ sys.path.append('../../')
 
 from global_methods import *
 from persona.prompt_template.run_gpt_prompt import *
+from persona.prompt_template.gpt_structure import * #added by Phoebe
 from persona.cognitive_modules.retrieve import *
 from persona.cognitive_modules.converse import *
 
@@ -442,20 +443,20 @@ def revise_identity(persona):
     for i in val: 
       statements += f"{i.created.strftime('%A %B %d -- %H:%M %p')}: {i.embedding_key}\n"
 
-  # print (";adjhfno;asdjao;idfjo;af", p_name)
+  print ("DEBUG def revise_identity:p_name::::", p_name)
   plan_prompt = statements + "\n"
   plan_prompt += f"Given the statements above, is there anything that {p_name} should remember as they plan for"
   plan_prompt += f" *{persona.scratch.curr_time.strftime('%A %B %d')}*? "
   plan_prompt += f"If there is any scheduling information, be as specific as possible (include date, time, and location if stated in the statement)\n\n"
   plan_prompt += f"Write the response from {p_name}'s perspective."
-  plan_note = ChatGPT_single_request(plan_prompt)
-  # print (plan_note)
+  plan_note = local_LLM(plan_prompt) # Phoebe modified this line``
+  print (plan_note)
 
   thought_prompt = statements + "\n"
   thought_prompt += f"Given the statements above, how might we summarize {p_name}'s feelings about their days up to now?\n\n"
   thought_prompt += f"Write the response from {p_name}'s perspective."
-  thought_note = ChatGPT_single_request(thought_prompt)
-  # print (thought_note)
+  thought_note = local_LLM(thought_prompt)
+  print (thought_note)
 
   currently_prompt = f"{p_name}'s status from {(persona.scratch.curr_time - datetime.timedelta(days=1)).strftime('%A %B %d')}:\n"
   currently_prompt += f"{persona.scratch.currently}\n\n"
@@ -464,11 +465,11 @@ def revise_identity(persona):
   currently_prompt += f"It is now {persona.scratch.curr_time.strftime('%A %B %d')}. Given the above, write {p_name}'s status for {persona.scratch.curr_time.strftime('%A %B %d')} that reflects {p_name}'s thoughts at the end of {(persona.scratch.curr_time - datetime.timedelta(days=1)).strftime('%A %B %d')}. Write this in third-person talking about {p_name}."
   currently_prompt += f"If there is any scheduling information, be as specific as possible (include date, time, and location if stated in the statement).\n\n"
   currently_prompt += "Follow this format below:\nStatus: <new status>"
-  # print ("DEBUG ;adjhfno;asdjao;asdfsidfjo;af", p_name)
-  # print (currently_prompt)
-  new_currently = ChatGPT_single_request(currently_prompt)
-  # print (new_currently)
-  # print (new_currently[10:])
+  print ("DEBUG def revise_identity::p_name:::", p_name)
+  print (currently_prompt)
+  new_currently = local_LLM(currently_prompt)
+  print (new_currently)
+  print (new_currently[10:])
 
   persona.scratch.currently = new_currently
 
@@ -477,7 +478,7 @@ def revise_identity(persona):
   daily_req_prompt += f"Follow this format (the list should have 4~6 items but no more):\n"
   daily_req_prompt += f"1. wake up and complete the morning routine at <time>, 2. ..."
 
-  new_daily_req = ChatGPT_single_request(daily_req_prompt)
+  new_daily_req = local_LLM(daily_req_prompt)
   new_daily_req = new_daily_req.replace('\n', ' ')
   print ("WE ARE HERE!!!", new_daily_req)
   persona.scratch.daily_plan_req = new_daily_req
@@ -512,18 +513,18 @@ def _long_term_planning(persona, new_day):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TODO
     # We need to create a new daily_req here...
     persona.scratch.daily_req = persona.scratch.daily_req
-  print ("DEBUG::: loaded new_day ",  persona.scratch.daily_req)
-  print ("DEBUG::: loadied  new_day, persona.scratch.daily_req",  persona.scratch.daily_req)
+  # print ("DEBUG::: loaded new_day ",  persona.scratch.daily_req)
+  # print ("DEBUG::: loaded  new_day, persona.scratch.daily_req",  persona.scratch.daily_req)
 
   # Based on the daily_req, we create an hourly schedule for the persona, 
   # which is a list of todo items with a time duration (in minutes) that 
   # add up to 24 hours.
   persona.scratch.f_daily_schedule = generate_hourly_schedule(persona, 
                                                               wake_up_hour)
-  print ("DEBUG::: loaded  persona.scratch.f_daily_schedule--------- " )
+  # print ("DEBUG::: loaded  persona.scratch.f_daily_schedule--------- " )
   print (persona.scratch.f_daily_schedule)
-  print("DEBUG::: end  persona.scratch.f_daily_schedule--------- " )
-  print ("DEBUG:::   EXAMPLE OUTPUT: [['sleeping', 360], ['waking up and starting her morning routine', 60], ['eating breakfast', 60],..e--------- " )
+  # print("DEBUG::: end  persona.scratch.f_daily_schedule--------- " )
+  # print ("DEBUG:::   EXAMPLE OUTPUT: [['sleeping', 360], ['waking up and starting her morning routine', 60], ['eating breakfast', 60],..e--------- " )
   persona.scratch.f_daily_schedule_hourly_org = (persona.scratch
                                                    .f_daily_schedule[:])
 

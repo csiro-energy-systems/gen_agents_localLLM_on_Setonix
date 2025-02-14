@@ -112,9 +112,11 @@ def compress4energy(sim_code):
 
 if __name__ == '__main__':
   simulation_names = [
-                      "simulation_base_the_ville_n25_24h_10s_run1_14h",
-                      "simulation_base_the_ville_n25_24h_10s_run2_11h",
-                      "simulation_base_the_ville_n25_24h_10s_run3_10h", "simulation_base_the_ville_n25_24h_30s_run1"]
+                      "simulation_base_the_ville_n25_24h_60s_run2" 
+                      # "simulation_base_the_ville_n25_24h_10s_run1_14h",
+                      # "simulation_base_the_ville_n25_24h_10s_run2_11h",
+                      # "simulation_base_the_ville_n25_24h_10s_run3_10h", "simulation_base_the_ville_n25_24h_30s_run1"
+                      ]
   for simulation_name in simulation_names:
       compress(simulation_name)
       print(f"Energy compressed successfully for {simulation_name}")

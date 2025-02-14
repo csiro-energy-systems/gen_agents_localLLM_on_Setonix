@@ -17,23 +17,13 @@ from energy.energy_calc_string_match import calculate_energy
 
 # simcodes
 files = [
-    "mistral-7b-1",
-    "mistral-7b-2",
-    "mistral-7b-3",
-    "mistral_debug",
-    "mistral-7b-4",
-    "mistral-7b-5",
-    "mistral-7b-6",
-    "mistral-7b-n5-1",
-    "mistral-7b-n5-2",
-    "mistral-7b-n5-3",
-    "mistral-7b-n5-4",
-    "mistral-7b-n5-5",
-    "mistral-7b-n5-6",
+    # "test-simulation-24hour",
+    # "simulation_base_the_ville_n25_24h_30s_run1_15h",
+    "simulation_base_the_ville_n25_24h_60s_run1"   
 ]
 
 # 10s per step, 6 is 1 min, 60 is 10 mins, 360 is 1hr 
-window_size = 360
+window_size = 60
 
 # fontsize of the plot
 font_size = 20
@@ -106,7 +96,7 @@ std_values = combined_data_total.groupby('step')['state'].std().reset_index()
 std_values['rolling_std'] = std_values['state'].rolling(window=window_size).std().fillna(0)
 
 # Convert 'step' values to hours
-mean_values['hours'] = mean_values['step'] * 10 / 3600
+mean_values['hours'] = mean_values['step'] * 60 / 3600
 
 # Plotting mean values
 plt.figure(figsize=(12, 8))

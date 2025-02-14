@@ -313,7 +313,7 @@ def local_LLM(prompt, model_param=None):
     start_index = inputs["input_ids"].shape[-1]
     outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, temperature=temperature) # Generate output  
     generation_output = outputs[0][start_index:]
-    import torch
+    # import torch
 
     ## added by Phoebe 1/2025
     print(f"Allocated memory: {torch.cuda.memory_allocated(0) / 1024**2:.2f} MB")
